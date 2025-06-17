@@ -1,0 +1,80 @@
+﻿@model List<ApplicationUser>
+@{
+    ViewData["Title"] = "Khám phá người dùng";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5>👤 Thông tin của bạn</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.CurrentUser != null)
+                    {
+                        <p><strong>Tên:</strong> @ViewBag.CurrentUser.FullName</p>
+                        <p><strong>Email:</strong> @ViewBag.CurrentUser.Email</p>
+                        <a href="/Chat" class="btn btn-primary btn-sm">💬 Tin nhắn</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <h2>💕 Khám phá người dùng mới</h2>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="row">
+                    @foreach (var user in Model)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <div class="avatar mb-3">
+                                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                                             style="width: 60px; height: 60px;">
+                                            <span class="text-white fs-4">
+                                                @(user.FullName?.Substring(0, 1).ToUpper() ?? "?")
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title">@user.FullName</h5>
+                                    <p class="text-muted">@user.Email</p>
+
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                onclick="startChat('@user.Id', '@user.FullName')">
+                                            💬 Nhắn tin
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm">
+                                            ❤️ Thích
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h4>🔍 Không có người dùng nào để khám phá</h4>
+                    <p class="text-muted">Hãy quay lại sau nhé!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function startChat(userId, userName) {
+            window.location.href = `/Chat?userId=${userId}&userName=${encodeURIComponent(userName)}`;
+        }
+    </script>
+}
