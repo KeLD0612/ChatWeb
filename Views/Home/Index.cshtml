@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ApplicationUser>
+@{
+    ViewData["Title"] = "Khám phá";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">💕 Khám phá người mới</h2>
+            <p class="text-center text-muted">Chào @ViewBag.CurrentUser.FullName! Hãy tìm hiểu những người thú vị xung quanh bạn.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (Model.Any())
+        {
+            @foreach (var user in Model)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(user.ProfilePicture ?? "https://via.placeholder.com/300x400?text=No+Photo")"
+                             class="card-img-top" alt="@user.FullName" style="height: 300px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@(user.FullName ?? "Người dùng")</h5>
+                            <p class="card-text flex-grow-1">@(user.Bio ?? "Chưa có thông tin giới thiệu")</p>
+                            <small class="text-muted mb-3">Tham gia: @user.CreatedAt.ToString("dd/MM/yyyy")</small>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-outline-secondary" onclick="passUser('@user.Id')">
+                                    👎 Bỏ qua
+                                </button>
+                                <button class="btn btn-danger" onclick="likeUser('@user.Id')">
+                                    ❤️ Thích
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    <h4>😊 Chưa có người dùng nào</h4>
+                    <p>Hãy quay lại sau để khám phá thêm nhiều người thú vị!</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function likeUser(userId) {
+        // TODO: Implement like functionality
+        alert('Đã thích user: ' + userId);
+    }
+
+    function passUser(userId) {
+        // TODO: Implement pass functionality
+        alert('Đã bỏ qua user: ' + userId);
+    }
+</script>
