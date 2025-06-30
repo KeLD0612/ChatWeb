@@ -1,0 +1,795 @@
+﻿/* Chat User List Styles */
+.user-item:hover {
+    background-color: #f8f9fa !important;
+    transition: background-color 0.2s ease;
+}
+
+.user-item.bg-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+.user-item.bg-primary {
+    color: white !important;
+    animation: highlightPulse 2s ease-in-out;
+}
+
+    .user-item.bg-primary h6,
+    .user-item.bg-primary small {
+        color: white !important;
+    }
+
+/* Highlight Animation */
+@keyframes highlightPulse {
+    0%, 100% {
+        background-color: #0d6efd;
+        transform: scale(1);
+    }
+
+    50% {
+        background-color: #0056b3;
+        transform: scale(1.02);
+    }
+}
+
+/* Messages Container Scrollbar */
+#messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#messages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+    #messages::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+/* Message Bubbles */
+.message-bubble {
+    max-width: 70%;
+    word-wrap: break-word;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Connection Status */
+#connection-status {
+    transition: all 0.3s ease;
+}
+
+    #connection-status .text-success {
+        color: #28a745 !important;
+    }
+
+    #connection-status .text-danger {
+        color: #dc3545 !important;
+    }
+
+    #connection-status .text-warning {
+        color: #ffc107 !important;
+    }
+
+/* Input Focus Effects */
+#messageInput:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+#sendButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container-fluid .row .col-md-3 {
+        margin-bottom: 1rem;
+    }
+
+    #messages {
+        height: 300px !important;
+    }
+
+    .user-item {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Loading Animation */
+.loading-dots {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 10px;
+}
+
+    .loading-dots div {
+        position: absolute;
+        top: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #0d6efd;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+
+        .loading-dots div:nth-child(1) {
+            left: 8px;
+            animation: loading1 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(2) {
+            left: 8px;
+            animation: loading2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(3) {
+            left: 32px;
+            animation: loading2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(4) {
+            left: 56px;
+            animation: loading3 0.6s infinite;
+        }
+
+@keyframes loading1 {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes loading3 {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0);
+    }
+}
+
+@keyframes loading2 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(24px, 0);
+    }
+}
+
+
+
+/* Voice Recording Styles */
+.recording-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.pulse-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #dc3545;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#voiceRecordingUI {
+    border-left: 4px solid #dc3545;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Voice Message Bubble */
+.voice-message {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 20px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 250px;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+    .voice-message .play-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+        .voice-message .play-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+.voice-waveform {
+    flex: 1;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.voice-progress {
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
+    transition: width 0.1s ease;
+}
+
+/* Call Modal Styles */
+#callModal .modal-content {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+#callModal .modal-body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Call Button Animations */
+.call-button {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+    .call-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .call-button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.6s ease;
+        transform: translate(-50%, -50%);
+    }
+
+    .call-button:active::before {
+        width: 300px;
+        height: 300px;
+    }
+
+/* Video Call Styles */
+#localVideo {
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+    #localVideo:hover {
+        border-color: #0d6efd;
+        transform: scale(1.05);
+    }
+
+#remoteVideo {
+    border-radius: 15px;
+    object-fit: cover;
+    background: #000;
+}
+
+/* Audio Call Avatar */
+#audioCallAvatar {
+    animation: fadeIn 0.5s ease-out;
+}
+
+    #audioCallAvatar .rounded-circle {
+        animation: breathe 3s ease-in-out infinite;
+    }
+
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Call Controls */
+.call-controls {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 25px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.call-control-btn {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+    .call-control-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .call-control-btn.muted {
+        background-color: #dc3545 !important;
+        animation: shake 0.5s ease-in-out;
+    }
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Incoming Call Animation */
+#incomingCallUI {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#incomingCallUI .rounded-circle {
+    animation: ringPulse 2s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+    }
+
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 20px rgba(13, 110, 253, 0);
+    }
+}
+
+/* Outgoing Call Animation */
+#outgoingCallUI .spinner-border {
+    animation: spin 1s linear infinite, colorChange 3s ease-in-out infinite;
+}
+
+@keyframes colorChange {
+    0%, 100% {
+        border-top-color: #0d6efd;
+    }
+
+    33% {
+        border-top-color: #28a745;
+    }
+
+    66% {
+        border-top-color: #ffc107;
+    }
+}
+
+/* File Upload Progress */
+#uploadProgress {
+    animation: slideDown 0.3s ease-out;
+    border-left: 4px solid #0d6efd;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+    #uploadProgress .progress {
+        height: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    #uploadProgress .progress-bar {
+        background: linear-gradient(90deg, #0d6efd 0%, #0056b3 100%);
+        animation: progressShine 2s ease-in-out infinite;
+    }
+
+@keyframes progressShine {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+/* Active User Highlight */
+.user-item.active {
+    background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%) !important;
+    color: white !important;
+    border-radius: 10px;
+    margin: 2px;
+    animation: activeUserGlow 2s ease-in-out;
+}
+
+@keyframes activeUserGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+    }
+}
+
+/* Button Hover Effects */
+#audioCallButton:hover {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+#videoCallButton:hover {
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+#voiceButton:hover {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+#attachButton:hover {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Connection Status Indicator */
+.connection-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .connection-status.connected {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .connection-status.connecting {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: white;
+        animation: pulse 1.5s infinite;
+    }
+
+    .connection-status.disconnected {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        animation: shake 0.5s ease-in-out;
+    }
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 768px) {
+    #callModal .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .call-control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    #localVideo {
+        width: 120px !important;
+        height: 80px !important;
+    }
+
+    .voice-message {
+        max-width: 200px;
+    }
+
+    #voiceRecordingUI {
+        margin: 0 10px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    #voiceRecordingUI {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        color: white;
+    }
+
+    #uploadProgress {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        color: white;
+    }
+
+    .voice-message {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    }
+
+    /* Thêm vào cuối file chat.css hiện tại */
+
+    /* Active user highlight - improved */
+    .user-item.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%) !important;
+        color: white !important;
+        border-radius: 10px;
+        margin: 2px;
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        animation: activeUserGlow 1s ease-in-out;
+    }
+
+        .user-item.active .fw-bold,
+        .user-item.active .text-muted {
+            color: white !important;
+        }
+
+    @keyframes activeUserGlow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+        }
+
+        100% {
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+    }
+
+    /* Voice Recording Styles */
+    .recording-indicator {
+        display: flex;
+        align-items: center;
+    }
+
+    .pulse-dot {
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Voice Message Bubble */
+    .voice-message {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 20px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 250px;
+        animation: messageSlideIn 0.3s ease-out;
+    }
+
+        .voice-message .play-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+            .voice-message .play-button:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+
+    .voice-waveform {
+        flex: 1;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .voice-progress {
+        height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 10px;
+        transition: width 0.1s ease;
+    }
+
+    /* Connection Status */
+    .connection-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .connection-status.connected {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .connection-status.connecting {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .connection-status.disconnected {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            animation: shake 0.5s ease-in-out;
+        }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    /* Call Button Animations */
+    .call-button {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .call-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Call Controls */
+    .call-controls {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        padding: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .call-control-btn {
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .call-control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .call-control-btn.muted {
+            background-color: #dc3545 !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+}
+

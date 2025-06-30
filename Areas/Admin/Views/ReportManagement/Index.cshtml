@@ -1,0 +1,153 @@
+﻿@* Areas/Admin/Views/ReportManagement/Index.cshtml *@
+@model IEnumerable<Report>
+@{
+    ViewData["Title"] = "Quản lý Reports";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>🚨 Quản lý Reports</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Tabs -->
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewBag.CurrentStatus == "all" ? "active" : "")"
+                               asp-action="Index" asp-route-status="all">
+                                Tất cả (@(ViewBag.PendingCount + ViewBag.ResolvedCount + ViewBag.RejectedCount))
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewBag.CurrentStatus == "pending" ? "active" : "")"
+                               asp-action="Index" asp-route-status="pending">
+                                Chờ xử lý (@ViewBag.PendingCount)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewBag.CurrentStatus == "resolved" ? "active" : "")"
+                               asp-action="Index" asp-route-status="resolved">
+                                Đã xử lý (@ViewBag.ResolvedCount)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewBag.CurrentStatus == "rejected" ? "active" : "")"
+                               asp-action="Index" asp-route-status="rejected">
+                                Đã từ chối (@ViewBag.RejectedCount)
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Reports Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Người báo cáo</th>
+                                    <th>Người bị báo cáo</th>
+                                    <th>Lý do</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var report in Model)
+                                {
+                                    <tr>
+                                        <td>#@report.ReportId</td>
+                                        <td>@report.Reporter.GetDisplayName()</td>
+                                        <td>@report.ReportedUser.GetDisplayName()</td>
+                                        <td>
+                                            <span class="text-truncate" style="max-width: 200px;">
+                                                @report.Reason
+                                            </span>
+                                        </td>
+                                        <td>@report.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="badge @(report.Status == "Pending" ? "bg-warning" :
+                                                                                                                  report.Status == "Resolved" ? "bg-success" : "bg-danger")">
+                                            @report.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@report.ReportId"
+                                               class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @if (report.Status == "Pending")
+                                                {
+                                                    <button class="btn btn-sm btn-success"
+                                                            onclick="processReport(@report.ReportId, 'resolve')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                            onclick="processReport(@report.ReportId, 'ban_user')">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (ViewBag.TotalPages > 1)
+                    {
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                           asp-route-status="@ViewBag.CurrentStatus">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function processReport(reportId, action) {
+            let confirmMessage = '';
+            switch(action) {
+                case 'resolve':
+                    confirmMessage = 'Bạn có chắc muốn đánh dấu report này là đã xử lý?';
+                    break;
+                case 'ban_user':
+                    confirmMessage = 'Bạn có chắc muốn BAN user này?';
+                    break;
+                case 'reject':
+                    confirmMessage = 'Bạn có chắc muốn từ chối report này?';
+                    break;
+            }
+
+            if (confirm(confirmMessage)) {
+                $.post('/Admin/ReportManagement/ProcessReport', {
+                    id: reportId,
+                    action: action
+                })
+                .done(function(data) {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+}

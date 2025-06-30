@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🎉 @ViewBag.Message</h4>
+                </div>
+                <div class="card-body text-center">
+                    @if (ViewBag.CurrentUser != null)
+                    {
+                        <h5>Xin chào, @ViewBag.CurrentUser.FullName!</h5>
+                        <p class="text-muted">Email: @ViewBag.CurrentUser.Email</p>
+                    }
+
+                    <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
+                        <a href="/Chat" class="btn btn-primary btn-lg">
+                            💬 Bắt đầu chat
+                        </a>
+                        <a href="/Profile" class="btn btn-outline-primary btn-lg">
+                            👤 Cập nhật profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

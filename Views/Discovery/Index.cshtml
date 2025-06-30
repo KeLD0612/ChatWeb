@@ -1,0 +1,163 @@
+@* @{
+    Layout = null;
+} *@
+
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Khám phá người mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/swipe-discovery.css" asp-append-version="true">
+    <meta name="__RequestVerificationToken" content="@Html.AntiForgeryToken().ToString().Replace("<input name='__RequestVerificationToken' type='hidden' value='", "").Replace("' />", "")" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">💕 Khám phá người mới</h1>
+            <p class="app-subtitle">Chào @(ViewBag.CurrentUser?.FullName ?? "bạn")! Tìm kiếm những kết nối mới</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner"></div>
+
+            <!-- Card Stack Container -->
+            <div class="card-stack-container">
+                <div class="card-stack" id="cardStack">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var user in Model.Take(5))
+                        {
+                            <div class="user-card" data-user-id="@user.Id">
+                                <div class="card-header">
+                                    <div class="user-avatar">
+                                        @(user.FullName?.ToString()?.Substring(0, 1)?.ToUpper() ?? "👤")
+                                    </div>
+                                    <h2 class="user-name">@(user.FullName ?? "Người dùng")</h2>
+                                    <p class="user-bio">@(user.Bio ?? "Chưa có thông tin giới thiệu")</p>
+                                </div>
+                                <div class="user-meta">
+                                    <div class="meta-item">
+                                        <div class="meta-label">Tham gia</div>
+                                        <div class="meta-value">@user.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">ID</div>
+                                        <div class="meta-value">#@user.Id</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <!-- Swipe Indicators -->
+                <div class="swipe-indicator swipe-indicator--left" id="leftIndicator">
+                    <span class="indicator-text">BỎ QUA</span>
+                </div>
+                <div class="swipe-indicator swipe-indicator--right" id="rightIndicator">
+                    <span class="indicator-text">THÍCH</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn action-btn--pass" id="passBtn" title="Bỏ qua (←)" type="button">
+                    <span class="btn-icon">👎</span>
+                </button>
+                <button class="action-btn action-btn--like" id="likeBtn" title="Thích (→)" type="button">
+                    <span class="btn-icon">❤️</span>
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: @(Model == null || !Model.Any() ? "block" : "none");">
+                <div class="empty-state-content">
+                    <div class="empty-state-icon">😊</div>
+                    <h2 class="empty-state-title">Không còn người dùng nào</h2>
+                    <p class="empty-state-text">Bạn đã xem hết tất cả người dùng. Hãy quay lại sau nhé!</p>
+                    <button class="btn btn--primary" id="reloadBtn" type="button">Tải lại</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <p>💡 <strong>Hướng dẫn:</strong> Kéo thẻ hoặc dùng phím mũi tên ← → để tương tác</p>
+        </div>
+    </div>
+
+    @Html.AntiForgeryToken()
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/swipe-discovery.js" asp-append-version="true"></script>
+
+    <style>
+        /* Match notification popup styles */
+        .match-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .match-content {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .match-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .match-content p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .match-content button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .match-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+    </style>
+</body>
+</html>
