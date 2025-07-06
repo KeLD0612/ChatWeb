@@ -1,0 +1,225 @@
+﻿@* Areas/Admin/Views/UserManagement/Details.cshtml *@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Chi tiết User";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- User Info Card -->
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user"></i> Thông tin User
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <img src="@(Model.ProfilePicture ?? "/images/default-avatar.png")"
+                                         class="img-fluid rounded-circle mb-3"
+                                         style="width: 150px; height: 150px; object-fit: cover;"
+                                         alt="User Avatar">
+                                    <h5>@(Model.FullName ?? "N/A")</h5>
+                                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger") fs-6">
+                                        @(Model.IsActive ? "Hoạt động" : "Vô hiệu hóa")
+                                    </span>
+                                </div>
+                                <div class="col-md-8">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>ID:</strong></td>
+                                            <td>@Model.Id</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td>
+                                                @Model.Email
+                                                @if (Model.EmailConfirmed)
+                                                {
+                                                    <i class="fas fa-check-circle text-success" title="Email đã xác thực"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-times-circle text-danger" title="Email chưa xác thực"></i>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tên đầy đủ:</strong></td>
+                                            <td>@(Model.FullName ?? "Chưa cập nhật")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Số điện thoại:</strong></td>
+                                            <td>@(Model.PhoneNumber ?? "Chưa cập nhật")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ngày sinh:</strong></td>
+                                            <td>
+                                                @if (Model.DateOfBirth != default(DateTime))
+                                                {
+                                                    @Model.DateOfBirth.ToString("dd/MM/yyyy")
+                                                    <small class="text-muted">(@((DateTime.Now.Year - Model.DateOfBirth.Year)) tuổi)</small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa cập nhật</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tiểu sử:</strong></td>
+                                            <td>@(Model.Bio ?? "Chưa có tiểu sử")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ngày tạo:</strong></td>
+                                            <td>
+                                                @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                <small class="text-muted">(@((DateTime.Now - Model.CreatedAt).Days) ngày trước)</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Hoạt động cuối:</strong></td>
+                                            <td>
+                                                @if (Model.LastActive.HasValue)
+                                                {
+                                                    @Model.LastActive.Value.ToString("dd/MM/yyyy HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa có dữ liệu</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Roles:</strong></td>
+                                            <td>
+                                                @if (ViewBag.UserRoles != null)
+                                                {
+                                                    @foreach (string role in ViewBag.UserRoles)
+                                                    {
+                                                        <span class="badge bg-primary me-1">@role</span>
+                                                    }
+                                                }
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Card -->
+                <div class="col-md-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar"></i> Thống kê hoạt động
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <h4 class="text-primary">@ViewBag.MessagesSent</h4>
+                                        <small>Tin nhắn gửi</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <h4 class="text-info">@ViewBag.MessagesReceived</h4>
+                                        <small>Tin nhắn nhận</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <h4 class="text-warning">@ViewBag.LikesGiven</h4>
+                                        <small>Lượt thích</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <h4 class="text-success">@ViewBag.LikesReceived</h4>
+                                        <small>Được thích</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card shadow mt-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tools"></i> Hành động
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-@(Model.IsActive ? "warning" : "success")"
+                                        onclick="toggleUserStatus('@Model.Id')">
+                                    <i class="fas fa-@(Model.IsActive ? "ban" : "check")"></i>
+                                    @(Model.IsActive ? "Vô hiệu hóa" : "Kích hoạt")
+                                </button>
+                                <button class="btn btn-info" onclick="resetPassword('@Model.Id')">
+                                    <i class="fas fa-key"></i> Reset mật khẩu
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser('@Model.Id', '@Model.Email')">
+                                    <i class="fas fa-trash"></i> Xóa user
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleUserStatus(userId) {
+            if (confirm('Bạn có chắc muốn thay đổi trạng thái user này?')) {
+                $.post('/Admin/UserManagement/ToggleStatus', { id: userId })
+                    .done(function(data) {
+                        if (data.success) {
+                            alert('Trạng thái user đã được cập nhật');
+                            location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra: ' + data.message);
+                        }
+                    });
+            }
+        }
+
+        function deleteUser(userId, userEmail) {
+            if (confirm(`Bạn có chắc muốn XÓA user "${userEmail}"?\n\nHành động này không thể hoàn tác!`)) {
+                $.post('/Admin/UserManagement/Delete', { id: userId })
+                    .done(function(data) {
+                        if (data.success) {
+                            alert('User đã được xóa thành công');
+                            window.location.href = '/Admin/UserManagement';
+                        } else {
+                            alert('Có lỗi xảy ra: ' + data.message);
+                        }
+                    });
+            }
+        }
+
+        function resetPassword(userId) {
+            alert('Tính năng reset mật khẩu đang được phát triển');
+        }
+    </script>
+}

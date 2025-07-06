@@ -1,0 +1,607 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewData["Title"] - Admin Panel</title>
+
+    <!-- Custom fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            background-color: #f8f9fc;
+            transition: margin-left 0.3s ease;
+        }
+
+        .topbar {
+            height: 4.375rem;
+            background-color: #fff;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        /* Sidebar Navigation Styles */
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 2px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+        }
+
+            .sidebar .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+                transform: translateX(5px);
+            }
+
+            .sidebar .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.3);
+                color: white;
+                font-weight: 600;
+            }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-brand-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .sidebar-divider {
+            border-color: rgba(255, 255, 255, 0.2);
+            margin: 10px 20px;
+        }
+
+        /* Badge cho pending reports */
+        .nav-link .badge {
+            font-size: 0.7em;
+            padding: 0.25em 0.6em;
+            border-radius: 50px;
+        }
+
+        .badge.pulse {
+            animation: pulse 2s infinite;
+        }
+
+        
+
+
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        /* Custom toast styles */
+        .toast {
+            border: 1px solid rgba(0,0,0,.125);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            min-width: 350px;
+        }
+
+        .toast-header.bg-warning {
+            color: #000;
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            display: none;
+            width: 2.75rem;
+            height: 2.75rem;
+            text-align: center;
+            color: #fff;
+            background: rgba(90, 92, 105, 0.5);
+            line-height: 46px;
+            border-radius: 100%;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+            .scroll-to-top:hover {
+                background: rgba(90, 92, 105, 0.8);
+                color: white;
+            }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+        <div class="sidebar-brand d-flex align-items-center justify-content-center">
+            <div class="sidebar-brand-text mx-3">💕 Admin Panel</div>
+        </div>
+
+        <hr class="sidebar-divider my-0">
+
+        <!-- Dashboard -->
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")"
+               asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <!-- User Management -->
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserManagement" ? "active" : "")"
+               asp-area="Admin" asp-controller="UserManagement" asp-action="Index">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Quản lý Users</span>
+            </a>
+        </li>
+
+        <!-- Message Management -->
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "MessageManagement" ? "active" : "")"
+               asp-area="Admin" asp-controller="MessageManagement" asp-action="Index">
+                <i class="fas fa-fw fa-comments"></i>
+                <span>Quản lý Messages</span>
+            </a>
+        </li>
+
+        <!-- Report Management - CẬP NHẬT -->
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "ReportManagement" ? "active" : "")"
+               asp-area="Admin" asp-controller="ReportManagement" asp-action="Index">
+                <i class="fas fa-fw fa-flag text-danger"></i>
+                <span>Quản lý báo cáo</span>
+                <span class="badge bg-warning ms-auto" id="pendingReportsCount" style="display: none;">0</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <!-- Debug Tools -->
+        <li class="nav-item">
+            <a class="nav-link" href="/Chat/DebugUsers" target="_blank">
+                <i class="fas fa-fw fa-bug"></i>
+                <span>Debug Tools</span>
+            </a>
+        </li>
+
+        <!-- Settings -->
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="Settings" asp-action="Index">
+                <i class="fas fa-fw fa-cogs"></i>
+                <span>Cài đặt</span>
+            </a>
+        </li>
+
+        <!-- Back to Main Site -->
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Home" asp-action="Index" asp-area="">
+                <i class="fas fa-fw fa-home"></i>
+                <span>Về trang chủ</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider d-none d-md-block">
+    </ul>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column main-content">
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
+                <!-- Sidebar Toggle (Mobile) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Search -->
+                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Tìm kiếm..." id="globalSearch">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Nav Item - Reports Alert -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-flag fa-fw text-danger"></i>
+                            <span class="badge badge-danger badge-counter" id="topbarReportsCount">0</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow" style="min-width: 300px;">
+                            <h6 class="dropdown-header">Báo cáo mới</h6>
+                            <div id="recentReports">
+                                <div class="text-center p-3">
+                                    <small class="text-muted">Đang tải...</small>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-center small text-gray-500"
+                               href="@Url.Action("Index", "ReportManagement", new { area = "Admin" })">
+                                Xem tất cả báo cáo
+                            </a>
+                        </div>
+                    </li>
+
+                    <!-- Nav Item - Alerts -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell fa-fw"></i>
+                            <span class="badge badge-danger badge-counter">3+</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow">
+                            <h6 class="dropdown-header">Thông báo</h6>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-file-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                New user registered
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                        </div>
+                    </li>
+
+                    <!-- Nav Item - Messages -->
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-envelope fa-fw"></i>
+                            <span class="badge badge-danger badge-counter">7</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow">
+                            <h6 class="dropdown-header">Tin nhắn</h6>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                                New message received
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+                        </div>
+                    </li>
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                @(User.Identity.Name ?? "Admin")
+                            </span>
+                            <i class="fas fa-user-circle fa-fw"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow">
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/Identity/Account/Logout">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Dating App Admin 2024</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container"></div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+
+    <!-- Custom scripts -->
+    <script>
+        // Global variables
+        let signalRConnection = null;
+
+        // Initialize on page load
+        $(document).ready(function() {
+            // Load initial data
+            loadPendingReportsCount();
+            loadRecentReports();
+
+            // Setup SignalR
+            setupSignalR();
+
+            // Auto refresh data every 30 seconds
+            setInterval(() => {
+                loadPendingReportsCount();
+                loadRecentReports();
+            }, 30000);
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        });
+
+        // Load số lượng báo cáo pending
+        async function loadPendingReportsCount() {
+            try {
+                const response = await fetch('@Url.Action("GetReportStats", "ReportManagement", new { area = "Admin" })');
+                const data = await response.json();
+
+                // Update sidebar badge
+                const sidebarBadge = document.getElementById('pendingReportsCount');
+                if (sidebarBadge && data.PendingReports !== undefined) {
+                    sidebarBadge.textContent = data.PendingReports;
+                    sidebarBadge.style.display = data.PendingReports > 0 ? 'inline' : 'none';
+
+                    if (data.PendingReports > 0) {
+                        sidebarBadge.classList.add('pulse');
+                    } else {
+                        sidebarBadge.classList.remove('pulse');
+                    }
+                }
+
+                // Update topbar badge
+                const topbarBadge = document.getElementById('topbarReportsCount');
+                if (topbarBadge) {
+                    topbarBadge.textContent = data.PendingReports;
+                    topbarBadge.style.display = data.PendingReports > 0 ? 'inline' : 'none';
+                }
+            } catch (error) {
+                console.error('Error loading pending reports count:', error);
+            }
+        }
+
+        // Load báo cáo gần đây cho dropdown
+        async function loadRecentReports() {
+            try {
+                const response = await fetch('@Url.Action("Index", "ReportManagement", new { area = "Admin", status = "pending" })');
+                // This is a simplified version - in real implementation, you'd have a specific API endpoint
+                // for getting recent reports in JSON format
+
+                const container = document.getElementById('recentReports');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center p-2">
+                            <small class="text-muted">Có ${document.getElementById('pendingReportsCount')?.textContent || 0} báo cáo chờ xử lý</small>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading recent reports:', error);
+            }
+        }
+
+        // Setup SignalR connection
+        function setupSignalR() {
+            signalRConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .build();
+
+            signalRConnection.start().then(function () {
+                console.log('Admin SignalR connected');
+
+                // Lắng nghe báo cáo mới
+                signalRConnection.on("NewReportReceived", function (reportInfo) {
+                    showNewReportNotification(reportInfo);
+                    loadPendingReportsCount();
+                    loadRecentReports();
+                });
+
+            }).catch(function (err) {
+                console.error('SignalR connection error:', err);
+                // Retry after 5 seconds
+                setTimeout(setupSignalR, 5000);
+            });
+        }
+
+        // Hiển thị thông báo báo cáo mới
+        function showNewReportNotification(reportInfo) {
+            const toast = document.createElement('div');
+            toast.className = 'toast show';
+            toast.innerHTML = `
+                <div class="toast-header bg-warning">
+                    <i class="fas fa-flag text-dark me-2"></i>
+                    <strong class="me-auto">Báo cáo mới</strong>
+                    <small class="text-muted">Vừa xong</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    <div><strong>Lý do:</strong> ${reportInfo.reason}</div>
+                    <div><strong>Người báo cáo:</strong> ${reportInfo.reporterEmail}</div>
+                    <div class="mt-2">
+                        <a href="@Url.Action("Details", "ReportManagement", new { area = "Admin" })/${reportInfo.reportId}"
+                           class="btn btn-sm btn-primary">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 10000);
+
+            // Play notification sound
+            playNotificationSound();
+        }
+
+        // Play notification sound
+        function playNotificationSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmcfCKjrAA==');
+                audio.volume = 0.3;
+                audio.play().catch(() => {}); // Ignore errors
+            } catch (error) {
+                // Ignore audio errors
+            }
+        }
+
+        // Mobile sidebar toggle
+        $("#sidebarToggleTop").on('click', function(e) {
+            e.preventDefault();
+            $('.sidebar').toggleClass('show');
+            $('#sidebarOverlay').toggleClass('show');
+        });
+
+        // Sidebar overlay click (mobile)
+        $('#sidebarOverlay').on('click', function() {
+            $('.sidebar').removeClass('show');
+            $(this).removeClass('show');
+        });
+
+        // Close sidebar when resizing to desktop
+        $(window).resize(function() {
+            if ($(window).width() > 768) {
+                $('.sidebar').removeClass('show');
+                $('#sidebarOverlay').removeClass('show');
+            }
+        });
+
+        // Scroll to top button
+        $(document).on('scroll', function() {
+            var scrollDistance = $(this).scrollTop();
+            if (scrollDistance > 100) {
+                $('.scroll-to-top').fadeIn();
+            } else {
+                $('.scroll-to-top').fadeOut();
+            }
+        });
+
+        // Smooth scrolling
+        $(document).on('click', 'a.scroll-to-top', function(e) {
+            $('html, body').stop().animate({
+                scrollTop: 0
+            }, 1000);
+            e.preventDefault();
+        });
+
+        // Global search
+        $('#globalSearch').on('keypress', function(e) {
+            if (e.which == 13) {
+                var searchTerm = $(this).val();
+                if (searchTerm) {
+                    console.log('Searching for: ' + searchTerm);
+                    showToast('Search', 'Searching for: ' + searchTerm, 'info');
+                }
+            }
+        });
+
+        // Toast notification function
+        function showToast(title, message, type = 'info') {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <strong>${title}:</strong> ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+
+            const toastContainer = document.getElementById('toast-container');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = toastHtml;
+            const toastElement = tempDiv.firstElementChild;
+            toastContainer.appendChild(toastElement);
+
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+
+            // Auto remove
+            setTimeout(() => {
+                if (toastElement.parentNode) {
+                    toastElement.remove();
+                }
+            }, 5000);
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

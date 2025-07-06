@@ -12,10 +12,11 @@ using System;
 using System.Reflection;
 
 [assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("178dd5ef-1e33-4761-be00-4a0b5533b8aa")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("webchat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+52569cf1794ca963601f1d98b5383a9f45f64c35")]
 [assembly: System.Reflection.AssemblyProductAttribute("webchat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("webchat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

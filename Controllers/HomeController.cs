@@ -48,6 +48,32 @@ namespace webchat.Controllers
                 return View("Dashboard");
             }
         }
+        [Authorize]
+        public async Task<IActionResult> Explore()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
+            try
+            {
+                var usersToExplore = await _context.Users
+                    .Where(u => u.Id != currentUser.Id && u.IsActive)
+                    .Take(10)
+                    .ToListAsync();
+
+                ViewBag.CurrentUser = currentUser;
+                return View("Explore", usersToExplore);
+            }
+            catch (Exception)
+            {
+                ViewBag.CurrentUser = currentUser;
+                ViewBag.Message = "Chào mừng bạn đến với Dating App!";
+                return View("Dashboard");
+            }
+        }
 
         [AllowAnonymous]
         public IActionResult Privacy()

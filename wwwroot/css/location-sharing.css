@@ -1,0 +1,205 @@
+﻿/* location-sharing.css - Styles cho chức năng chia sẻ vị trí */
+
+/* Location Message Styles */
+.location-message {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    border-radius: 12px;
+    padding: 12px;
+    max-width: 300px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.message-mine .location-message {
+    background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+}
+
+.location-header {
+    font-weight: 600;
+    color: #0d6efd;
+    display: flex;
+    align-items: center;
+}
+
+.location-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+.location-map-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+    .location-map-container:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.location-map-image {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.location-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 10px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.location-map-container:hover .location-overlay {
+    opacity: 1;
+}
+
+.location-coordinates {
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 4px;
+    text-align: right;
+}
+
+/* Location Modal Styles */
+#locationMap {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    #locationMap:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+#locationStatusContainer .alert {
+    margin-bottom: 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#locationButton {
+    color: #0d6efd;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+    #locationButton:hover:not(:disabled) {
+        background-color: #e6f2ff;
+        color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+#refreshLocationBtn:hover {
+    animation: spin 1s ease;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Location share button animation */
+#locationButton {
+    position: relative;
+    overflow: hidden;
+}
+
+    #locationButton::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(13, 110, 253, 0.3);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+
+    #locationButton:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: scale(25, 25);
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .location-message {
+        max-width: 250px;
+    }
+
+    #locationMap {
+        height: 300px !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .location-message {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        color: #e2e8f0;
+    }
+
+    .message-mine .location-message {
+        background: linear-gradient(135deg, #2a4365 0%, #1a365d 100%);
+    }
+
+    .location-header {
+        color: #63b3ed;
+    }
+
+    .location-coordinates {
+        color: #a0aec0;
+    }
+
+    #locationMap {
+        border-color: #4a5568;
+    }
+}

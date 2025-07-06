@@ -6,6 +6,9 @@
 
 <!-- Link CSS cho chat -->
 <link rel="stylesheet" href="~/css/chat.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/chat-settings.css" asp-append-version="true" />
+}
 
 <div class="container-fluid h-100">
     <div class="row h-100">
@@ -50,9 +53,9 @@
             <div class="p-3 border-bottom bg-white">
                 <div id="chatHeader" class="d-none">
                     <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2"
-                                 style="width: 40px; height: 40px;">
+                        <div class="d-flex align-items-center chat-user-info" data-bs-toggle="modal" data-bs-target="#chatSettingsModal">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2 chat-avatar"
+                                 style="width: 40px; height: 40px; cursor: pointer;" title="Cài đặt đoạn chat">
                                 <i class="fas fa-user text-white"></i>
                             </div>
                             <div>
@@ -80,7 +83,9 @@
 
             <!-- Messages Area -->
             <div class="flex-grow-1 overflow-auto p-3" id="messagesContainer" style="height: 400px;">
-                <div id="messages"></div>
+                <div id="messages">
+                    <!-- Tin nhắn sẽ được thêm động thông qua JavaScript -->
+                </div>
             </div>
 
             <!-- Voice Recording UI -->
@@ -135,90 +140,6 @@
                         📤 Gửi
                     </button>
                 </div>
-
-                <div class="mt-2">
-                    <small class="text-muted">
-                        Hỗ trợ: Ảnh, Video, PDF, Word, Text (tối đa 20MB) • Voice messages • Video/Audio calls
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Call Modal -->
-<div class="modal fade" id="callModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body p-0">
-                <div id="callInterface" class="text-center p-4">
-                    <!-- Incoming call UI -->
-                    <div id="incomingCallUI" style="display: none;">
-                        <div class="mb-3">
-                            <div class="rounded-circle bg-primary mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-user text-white fa-2x"></i>
-                            </div>
-                            <h5 id="incomingCallerName">Incoming Call</h5>
-                            <p class="text-muted" id="incomingCallType">Audio Call</p>
-                        </div>
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-danger btn-lg rounded-circle call-button" id="rejectCallButton" style="width: 60px; height: 60px;">
-                                <i class="fas fa-phone-slash"></i>
-                            </button>
-                            <button class="btn btn-success btn-lg rounded-circle call-button" id="acceptCallButton" style="width: 60px; height: 60px;">
-                                <i class="fas fa-phone"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Active call UI -->
-                    <div id="activeCallUI" style="display: none;">
-                        <div class="position-relative">
-                            <video id="remoteVideo" class="w-100 rounded" style="max-height: 400px; background: #000;" autoplay></video>
-                            <video id="localVideo" class="position-absolute rounded"
-                                   style="width: 150px; height: 100px; top: 10px; right: 10px; background: #000;"
-                                   autoplay muted></video>
-
-                            <div id="audioCallAvatar" class="d-flex flex-column align-items-center justify-content-center"
-                                 style="height: 300px; display: none;">
-                                <div class="rounded-circle bg-primary mb-3" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-user text-white fa-3x"></i>
-                                </div>
-                                <h5 id="activeCallUserName">User Name</h5>
-                                <p class="text-muted">Call duration: <span id="callDuration">00:00</span></p>
-                            </div>
-                        </div>
-
-                        <div class="call-controls d-flex justify-content-center gap-3 mt-3">
-                            <button class="btn btn-secondary btn-lg rounded-circle call-control-btn" id="muteButton" style="width: 50px; height: 50px;">
-                                <i class="fas fa-microphone"></i>
-                            </button>
-                            <button class="btn btn-secondary btn-lg rounded-circle call-control-btn" id="cameraButton" style="width: 50px; height: 50px; display: none;">
-                                <i class="fas fa-video"></i>
-                            </button>
-                            <button class="btn btn-danger btn-lg rounded-circle call-control-btn" id="endCallButton" style="width: 60px; height: 60px;">
-                                <i class="fas fa-phone-slash"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Outgoing call UI -->
-                    <div id="outgoingCallUI" style="display: none;">
-                        <div class="mb-3">
-                            <div class="rounded-circle bg-primary mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-user text-white fa-2x"></i>
-                            </div>
-                            <h5 id="outgoingCallUserName">Calling...</h5>
-                            <p class="text-muted" id="outgoingCallType">Audio Call</p>
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Calling...</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-danger btn-lg rounded-circle call-button" id="cancelCallButton" style="width: 60px; height: 60px;">
-                            <i class="fas fa-phone-slash"></i>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -229,861 +150,293 @@
     <i class="fas fa-wifi"></i> Connected
 </div>
 
-<!-- SignalR and Chat JavaScript -->
-<script src="https://unpkg.com/@@microsoft/signalr@latest/dist/browser/signalr.js"></script>
-<script>
-    let connection;
-    let currentUserId = '@ViewBag.CurrentUser?.Id';
-    let selectedUserId = '@ViewBag.SelectedUserId';
-    let selectedUserName = '@ViewBag.SelectedUserName';
-
-    // Voice recording variables
-    let mediaRecorder;
-    let audioChunks = [];
-    let recordingStartTime;
-    let recordingInterval;
-
-    // WebRTC variables
-    let localStream;
-    let remoteStream;
-    let peerConnection;
-    let currentCallId;
-    let currentCallType;
-    let callStartTime;
-    let callDurationInterval;
-    let isMuted = false;
-    let isCameraOff = false;
-
-    const rtcConfiguration = {
-        iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-        ]
-    };
-
-    // Initialize SignalR
-    async function initializeSignalR() {
-        try {
-            updateConnectionStatus('connecting');
-
-            connection = new signalR.HubConnectionBuilder()
-                .withUrl("/chatHub")
-                .withAutomaticReconnect()
-                .build();
-
-            // Message handlers
-            connection.on("ReceiveMessage", function (senderId, senderName, message, timestamp) {
-                displayMessage(senderId, senderName, message, timestamp);
-            });
-
-            connection.on("ReceiveMediaMessage", function (senderId, senderName, fileUrl, mediaType, fileName, fileSize, timestamp) {
-                displayMediaMessage(senderId, senderName, fileUrl, mediaType, fileName, fileSize, timestamp);
-            });
-
-            connection.on("ReceiveVoiceMessage", function (senderId, senderName, voiceUrl, duration, timestamp) {
-                displayVoiceMessage(senderId, senderName, voiceUrl, duration, timestamp);
-            });
-
-            // Call handlers
-            connection.on("IncomingCall", function (callId, callerId, callerName, callType) {
-                handleIncomingCall(callId, callerId, callerName, callType);
-            });
-
-            connection.on("CallAccepted", function (callId) {
-                handleCallAccepted(callId);
-            });
-
-            connection.on("CallRejected", function (callId) {
-                handleCallRejected(callId);
-            });
-
-            connection.on("CallEnded", function (callId) {
-                handleCallEnded(callId);
-            });
-
-            // WebRTC signaling
-            connection.on("ReceiveOffer", function (callId, offer) {
-                handleReceiveOffer(callId, offer);
-            });
-
-            connection.on("ReceiveAnswer", function (callId, answer) {
-                handleReceiveAnswer(callId, answer);
-            });
-
-            connection.on("ReceiveIceCandidate", function (callId, candidate) {
-                handleReceiveIceCandidate(callId, candidate);
-            });
-
-            connection.on("Error", function (errorMessage) {
-                console.error('❌ SignalR Error:', errorMessage);
-                updateConnectionStatus('disconnected');
-                showNotification('Lỗi: ' + errorMessage, 'error');
-            });
-
-            connection.onreconnecting(() => {
-                updateConnectionStatus('connecting');
-            });
-
-            connection.onreconnected(() => {
-                updateConnectionStatus('connected');
-                if (currentUserId) {
-                    connection.invoke("JoinUserGroup", currentUserId);
-                }
-            });
-
-            connection.onclose(() => {
-                updateConnectionStatus('disconnected');
-            });
-
-            await connection.start();
-            console.log('✅ SignalR connected successfully');
-            updateConnectionStatus('connected');
-
-            if (currentUserId) {
-                await connection.invoke("JoinUserGroup", currentUserId);
-            }
-
-        } catch (err) {
-            console.error('❌ SignalR connection failed:', err);
-            updateConnectionStatus('disconnected');
-            setTimeout(initializeSignalR, 5000);
-        }
-    }
-
-    // Update connection status
-    function updateConnectionStatus(status) {
-        const statusElement = document.getElementById('connectionStatus');
-        statusElement.className = `connection-status ${status}`;
-
-        switch(status) {
-            case 'connected':
-                statusElement.innerHTML = '<i class="fas fa-wifi"></i> Connected';
-                break;
-            case 'connecting':
-                statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
-                break;
-            case 'disconnected':
-                statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Disconnected';
-                break;
-        }
-    }
-
-    // Show notification
-    function showNotification(message, type = 'info') {
-        // Simple notification - you can enhance this with a proper notification library
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
-        notification.style.position = 'fixed';
-        notification.style.top = '70px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '1060';
-        notification.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 5000);
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-        // User selection
-        document.querySelectorAll('.user-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const userId = this.getAttribute('data-user-id');
-                const userName = this.getAttribute('data-user-name');
-                selectUser(userId, userName);
-            });
-        });
-
-        // Message sending
-        const sendButton = document.getElementById('sendButton');
-        const messageInput = document.getElementById('messageInput');
-
-        if (sendButton) {
-            sendButton.addEventListener('click', sendMessage);
-        }
-
-        if (messageInput) {
-            messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-        }
-
-        // File attachment
-        const attachButton = document.getElementById('attachButton');
-        const fileInput = document.getElementById('fileInput');
-
-        if (attachButton && fileInput) {
-            attachButton.addEventListener('click', function() {
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    uploadAndSendFile(file);
-                }
-            });
-        }
-
-        // Voice recording
-        const voiceButton = document.getElementById('voiceButton');
-        if (voiceButton) {
-            voiceButton.addEventListener('click', toggleVoiceRecording);
-        }
-
-        document.getElementById('cancelRecordingButton').addEventListener('click', cancelVoiceRecording);
-        document.getElementById('stopRecordingButton').addEventListener('click', stopVoiceRecording);
-
-        // Call buttons
-        document.getElementById('audioCallButton').addEventListener('click', () => initiateCall('audio'));
-        document.getElementById('videoCallButton').addEventListener('click', () => initiateCall('video'));
-
-        // Call modal buttons
-        document.getElementById('acceptCallButton').addEventListener('click', acceptCall);
-        document.getElementById('rejectCallButton').addEventListener('click', rejectCall);
-        document.getElementById('endCallButton').addEventListener('click', endCall);
-        document.getElementById('cancelCallButton').addEventListener('click', endCall);
-        document.getElementById('muteButton').addEventListener('click', toggleMute);
-        document.getElementById('cameraButton').addEventListener('click', toggleCamera);
-    }
-
-    // Select user
-    function selectUser(userId, userName) {
-        selectedUserId = userId;
-        selectedUserName = userName;
-
-        document.getElementById('selectedUserName').textContent = userName;
-        document.getElementById('chatHeader').classList.remove('d-none');
-        document.getElementById('noChatSelected').style.display = 'none';
-
-        const controls = ['messageInput', 'sendButton', 'attachButton', 'voiceButton', 'audioCallButton', 'videoCallButton'];
-        controls.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.disabled = false;
-                if (id === 'messageInput') {
-                    element.placeholder = `Nhắn tin với ${userName}...`;
-                }
-            }
-        });
-
-        document.querySelectorAll('.user-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        document.querySelector(`[data-user-id="${userId}"]`).classList.add('active');
-
-        document.getElementById('messages').innerHTML = '';
-        loadChatHistory(userId);
-    }
-
-    // Send message
-    async function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-
-        if (!message || !selectedUserId) return;
-
-        try {
-            await connection.invoke("SendMessage", selectedUserId, message);
-            messageInput.value = '';
-        } catch (err) {
-            console.error('❌ Send message error:', err);
-            showNotification('Lỗi gửi tin nhắn: ' + err.message, 'error');
-        }
-    }
-
-    // Upload file
-    function uploadAndSendFile(file) {
-        if (!selectedUserId) {
-            showNotification('Vui lòng chọn người để gửi file!', 'error');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('receiverId', selectedUserId);
-
-        document.getElementById('uploadProgress').style.display = 'block';
-
-        fetch('/FileUpload/UploadChatMedia', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('uploadProgress').style.display = 'none';
-
-            if (data.success) {
-                connection.invoke("SendMediaMessage", selectedUserId, data.fileUrl, data.mediaType, data.fileName, data.fileSize)
-                    .then(() => {
-                        console.log('✅ Media message sent successfully');
-                        document.getElementById('fileInput').value = '';
-                        showNotification('File đã được gửi thành công!', 'success');
-                    })
-                    .catch(err => {
-                        console.error('❌ Send media error:', err);
-                        showNotification('Lỗi gửi file: ' + err.message, 'error');
-                    });
-            } else {
-                showNotification('Lỗi upload: ' + data.error, 'error');
-            }
-        })
-        .catch(err => {
-            document.getElementById('uploadProgress').style.display = 'none';
-            console.error('❌ Upload error:', err);
-            showNotification('Lỗi upload file', 'error');
-        });
-    }
-
-    // Voice recording functions
-    async function toggleVoiceRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            stopVoiceRecording();
-        } else {
-            startVoiceRecording();
-        }
-    }
-
-    async function startVoiceRecording() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-
-            mediaRecorder.ondataavailable = function(event) {
-                audioChunks.push(event.data);
-            };
-
-            mediaRecorder.onstop = function() {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                uploadVoiceMessage(audioBlob);
-
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
-            recordingStartTime = Date.now();
-
-            document.getElementById('voiceRecordingUI').style.display = 'block';
-            document.getElementById('voiceButton').innerHTML = '<i class="fas fa-stop text-danger"></i>';
-
-            recordingInterval = setInterval(updateRecordingTime, 1000);
-
-        } catch (err) {
-            console.error('Error starting voice recording:', err);
-            showNotification('Không thể truy cập microphone', 'error');
-        }
-    }
-
-    function updateRecordingTime() {
-        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
-        document.getElementById('recordingTime').textContent =
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    function stopVoiceRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            clearInterval(recordingInterval);
-            hideRecordingUI();
-        }
-    }
-
-    function cancelVoiceRecording() {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            clearInterval(recordingInterval);
-            hideRecordingUI();
-            audioChunks = [];
-        }
-    }
-
-    function hideRecordingUI() {
-        document.getElementById('voiceRecordingUI').style.display = 'none';
-        document.getElementById('voiceButton').innerHTML = '🎤';
-    }
-
-    async function uploadVoiceMessage(audioBlob) {
-        if (!selectedUserId || audioChunks.length === 0) return;
-
-        const formData = new FormData();
-        formData.append('file', audioBlob, 'voice-message.webm');
-        formData.append('receiverId', selectedUserId);
-
-        document.getElementById('uploadProgress').style.display = 'block';
-
-        try {
-            const response = await fetch('/FileUpload/UploadVoiceMessage', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-            document.getElementById('uploadProgress').style.display = 'none';
-
-            if (data.success) {
-                const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-                await connection.invoke("SendVoiceMessage", selectedUserId, data.voiceUrl, duration);
-                showNotification('Voice message đã được gửi!', 'success');
-            } else {
-                showNotification('Lỗi upload voice: ' + data.error, 'error');
-            }
-        } catch (err) {
-            document.getElementById('uploadProgress').style.display = 'none';
-            console.error('❌ Upload voice error:', err);
-            showNotification('Lỗi upload voice message', 'error');
-        }
-    }
-
-    // Call functions
-    async function initiateCall(callType) {
-        if (!selectedUserId) {
-            showNotification('Vui lòng chọn người để gọi!', 'error');
-            return;
-        }
-
-        try {
-            currentCallType = callType;
-            await connection.invoke("InitiateCall", selectedUserId, callType);
-
-            document.getElementById('outgoingCallUserName').textContent = selectedUserName;
-            document.getElementById('outgoingCallType').textContent = callType === 'video' ? 'Video Call' : 'Audio Call';
-            document.getElementById('outgoingCallUI').style.display = 'block';
-
-            const callModal = new bootstrap.Modal(document.getElementById('callModal'));
-            callModal.show();
-
-        } catch (err) {
-            console.error('Error initiating call:', err);
-            showNotification('Không thể thực hiện cuộc gọi', 'error');
-        }
-    }
-
-    function handleIncomingCall(callId, callerId, callerName, callType) {
-        currentCallId = callId;
-        currentCallType = callType;
-
-        document.getElementById('incomingCallerName').textContent = callerName;
-        document.getElementById('incomingCallType').textContent = callType === 'video' ? 'Video Call' : 'Audio Call';
-        document.getElementById('incomingCallUI').style.display = 'block';
-
-        const callModal = new bootstrap.Modal(document.getElementById('callModal'));
-        callModal.show();
-    }
-
-    async function acceptCall() {
-        try {
-            await connection.invoke("AcceptCall", currentCallId);
-            await setupWebRTC(false);
-        } catch (err) {
-            console.error('Error accepting call:', err);
-            showNotification('Lỗi khi chấp nhận cuộc gọi', 'error');
-        }
-    }
-
-    async function rejectCall() {
-        try {
-            await connection.invoke("RejectCall", currentCallId);
-            hideCallModal();
-        } catch (err) {
-            console.error('Error rejecting call:', err);
-        }
-    }
-
-    async function endCall() {
-        try {
-            if (currentCallId) {
-                await connection.invoke("EndCall", currentCallId);
-            }
-            cleanupCall();
-            hideCallModal();
-        } catch (err) {
-            console.error('Error ending call:', err);
-        }
-    }
-
-    function handleCallAccepted(callId) {
-        currentCallId = callId;
-        setupWebRTC(true);
-    }
-
-    function handleCallRejected(callId) {
-        showNotification('Cuộc gọi bị từ chối', 'error');
-        hideCallModal();
-    }
-
-    function handleCallEnded(callId) {
-        cleanupCall();
-        hideCallModal();
-        showNotification('Cuộc gọi đã kết thúc', 'info');
-    }
-
-    // WebRTC functions
-    async function setupWebRTC(isCaller) {
-        try {
-            const constraints = {
-                audio: true,
-                video: currentCallType === 'video'
-            };
-
-            localStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-            peerConnection = new RTCPeerConnection(rtcConfiguration);
-
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
-
-            peerConnection.ontrack = function(event) {
-                remoteStream = event.streams[0];
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-            };
-
-            peerConnection.onicecandidate = function(event) {
-                if (event.candidate) {
-                    connection.invoke("SendIceCandidate", currentCallId, JSON.stringify(event.candidate));
-                }
-            };
-
-            showActiveCallUI();
-
-            if (isCaller) {
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                await connection.invoke("SendOffer", currentCallId, JSON.stringify(offer));
-            }
-
-        } catch (err) {
-            console.error('Error setting up WebRTC:', err);
-            showNotification('Không thể thiết lập kết nối', 'error');
-        }
-    }
-
-    async function handleReceiveOffer(callId, offer) {
-        try {
-            await peerConnection.setRemoteDescription(JSON.parse(offer));
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-            await connection.invoke("SendAnswer", callId, JSON.stringify(answer));
-        } catch (err) {
-            console.error('Error handling offer:', err);
-        }
-    }
-
-    async function handleReceiveAnswer(callId, answer) {
-        try {
-            await peerConnection.setRemoteDescription(JSON.parse(answer));
-        } catch (err) {
-            console.error('Error handling answer:', err);
-        }
-    }
-
-    async function handleReceiveIceCandidate(callId, candidate) {
-        try {
-            await peerConnection.addIceCandidate(JSON.parse(candidate));
-        } catch (err) {
-            console.error('Error handling ICE candidate:', err);
-        }
-    }
-
-    function showActiveCallUI() {
-        hideAllCallUIs();
-        document.getElementById('activeCallUI').style.display = 'block';
-
-        if (currentCallType === 'video') {
-            document.getElementById('localVideo').srcObject = localStream;
-            document.getElementById('localVideo').style.display = 'block';
-            document.getElementById('remoteVideo').style.display = 'block';
-            document.getElementById('audioCallAvatar').style.display = 'none';
-            document.getElementById('cameraButton').style.display = 'block';
-        } else {
-            document.getElementById('localVideo').style.display = 'none';
-            document.getElementById('remoteVideo').style.display = 'none';
-            document.getElementById('audioCallAvatar').style.display = 'flex';
-            document.getElementById('cameraButton').style.display = 'none';
-            document.getElementById('activeCallUserName').textContent = selectedUserName;
-        }
-
-        startCallTimer();
-    }
-
-    function toggleMute() {
-        if (localStream) {
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack) {
-                audioTrack.enabled = !audioTrack.enabled;
-                isMuted = !audioTrack.enabled;
-
-                const muteButton = document.getElementById('muteButton');
-                muteButton.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
-                muteButton.classList.toggle('muted', isMuted);
-            }
-        }
-    }
-
-    function toggleCamera() {
-        if (localStream && currentCallType === 'video') {
-            const videoTrack = localStream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.enabled = !videoTrack.enabled;
-                isCameraOff = !videoTrack.enabled;
-
-                const cameraButton = document.getElementById('cameraButton');
-                cameraButton.innerHTML = isCameraOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
-                cameraButton.classList.toggle('btn-danger', isCameraOff);
-                cameraButton.classList.toggle('btn-secondary', !isCameraOff);
-            }
-        }
-    }
-
-    function startCallTimer() {
-        callStartTime = Date.now();
-        callDurationInterval = setInterval(updateCallDuration, 1000);
-    }
-
-    function updateCallDuration() {
-        const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
-        document.getElementById('callDuration').textContent =
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    function cleanupCall() {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-
-        if (callDurationInterval) {
-            clearInterval(callDurationInterval);
-            callDurationInterval = null;
-        }
-
-        currentCallId = null;
-        currentCallType = null;
-        isMuted = false;
-        isCameraOff = false;
-    }
-
-    function hideCallModal() {
-        const callModal = bootstrap.Modal.getInstance(document.getElementById('callModal'));
-        if (callModal) {
-            callModal.hide();
-        }
-        hideAllCallUIs();
-    }
-
-    function hideAllCallUIs() {
-        document.getElementById('incomingCallUI').style.display = 'none';
-        document.getElementById('activeCallUI').style.display = 'none';
-        document.getElementById('outgoingCallUI').style.display = 'none';
-    }
-
-    // Display functions
-    function displayMessage(senderId, senderName, message, timestamp) {
-        const isCurrentUser = senderId === currentUserId;
-        const messageTime = new Date(timestamp).toLocaleTimeString('vi-VN');
-
-        const messageHtml = `
-            <div class="mb-3 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}">
-                <div class="message-bubble p-2 rounded shadow-sm ${isCurrentUser ? 'bg-primary text-white' : 'bg-white'}"
-                     style="max-width: 70%; border: 1px solid #dee2e6;">
-                    ${!isCurrentUser ? `<div class="fw-bold small mb-1">${senderName}</div>` : ''}
-                    <div>${message}</div>
-                    <div class="small mt-1" style="opacity: 0.7;">
-                        ${messageTime}
-                    </div>
-                </div>
+<!-- Chat Settings Modal -->
+<div class="modal fade" id="chatSettingsModal" tabindex="-1" aria-labelledby="chatSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chatSettingsModalLabel">Cài đặt đoạn chat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        `;
-
-        document.getElementById('messages').insertAdjacentHTML('beforeend', messageHtml);
-        scrollToBottom();
-    }
-
-    function displayMediaMessage(senderId, senderName, fileUrl, mediaType, fileName, fileSize, timestamp) {
-        const isCurrentUser = senderId === currentUserId;
-        const messageTime = new Date(timestamp).toLocaleTimeString('vi-VN');
-
-        let mediaHtml = '';
-        if (mediaType === 'image') {
-            mediaHtml = `
-                <img src="${fileUrl}" alt="${fileName}"
-                     class="img-fluid rounded mb-2" style="max-width: 300px; cursor: pointer;"
-                     onclick="window.open('${fileUrl}', '_blank')" />
-            `;
-        } else if (mediaType === 'video') {
-            mediaHtml = `
-                <video controls class="rounded mb-2" style="max-width: 300px;">
-                    <source src="${fileUrl}" type="video/mp4">
-                    Video không được hỗ trợ
-                </video>
-            `;
-        } else {
-            mediaHtml = `
-                <div class="d-flex align-items-center mb-2 p-2 bg-light rounded">
-                    <i class="fas fa-file-alt fa-2x me-2 text-primary"></i>
-                    <div>
-                        <div class="fw-bold">${fileName}</div>
-                        <small class="text-muted">${formatFileSize(fileSize)}</small>
-                    </div>
-                </div>
-                <a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-download"></i> Tải xuống
-                </a>
-            `;
-        }
-
-        const messageHtml = `
-            <div class="mb-3 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}">
-                <div class="message-bubble p-2 rounded shadow-sm ${isCurrentUser ? 'bg-primary text-white' : 'bg-white'}"
-                     style="max-width: 70%; border: 1px solid #dee2e6;">
-                    ${!isCurrentUser ? `<div class="fw-bold small mb-1">${senderName}</div>` : ''}
-                    ${mediaHtml}
-                    <div class="small mt-1" style="opacity: 0.7;">
-                        📎 ${fileName} • ${messageTime}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('messages').insertAdjacentHTML('beforeend', messageHtml);
-        scrollToBottom();
-    }
-
-    function displayVoiceMessage(senderId, senderName, voiceUrl, duration, timestamp) {
-        const isCurrentUser = senderId === currentUserId;
-        const messageTime = new Date(timestamp).toLocaleTimeString('vi-VN');
-        const durationText = formatDuration(duration);
-
-        const messageHtml = `
-            <div class="mb-3 d-flex ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}">
-                <div class="voice-message ${isCurrentUser ? '' : 'bg-white text-dark'}" style="border: 1px solid #dee2e6;">
-                    ${!isCurrentUser ? `<div class="fw-bold small mb-1 text-dark">${senderName}</div>` : ''}
-                    <div class="d-flex align-items-center">
-                        <button class="play-button" onclick="playVoiceMessage('${voiceUrl}', this)">
-                            <i class="fas fa-play"></i>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="chatSettingsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="background-tab" data-bs-toggle="tab"
+                                data-bs-target="#background-pane" type="button" role="tab"
+                                aria-controls="background-pane" aria-selected="true">
+                            <i class="fas fa-image"></i> Hình nền
                         </button>
-                        <div class="voice-waveform mx-2">
-                            <div class="voice-progress" style="width: 0%"></div>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="nickname-tab" data-bs-toggle="tab"
+                                data-bs-target="#nickname-pane" type="button" role="tab"
+                                aria-controls="nickname-pane" aria-selected="false">
+                            <i class="fas fa-user-edit"></i> Biệt danh
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="theme-tab" data-bs-toggle="tab"
+                                data-bs-target="#theme-pane" type="button" role="tab"
+                                aria-controls="theme-pane" aria-selected="false">
+                            <i class="fas fa-paint-brush"></i> Chủ đề
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-3" id="chatSettingsContent">
+                    <!-- Chỉ giữ phần hình nền mẫu -->
+                    <div class="tab-pane fade show active" id="background-pane" role="tabpanel" aria-labelledby="background-tab">
+                        <h4 class="mb-3">Hình nền đoạn chat</h4>
+
+                        <!-- Phần hiển thị hình nền mẫu có sẵn -->
+                        <div class="bg-templates-container mb-4">
+                            <h5>Hình nền mẫu</h5>
+                            <div class="row row-cols-2 row-cols-md-4 g-3" id="bgTemplatesGrid">
+                                <div class="col">
+                                    <div class="card h-100 bg-loading-placeholder">
+                                        <div class="card-body d-flex align-items-center justify-content-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="small">${durationText}</span>
+
+                        <div class="current-bg-preview mb-4">
+                            <h5>Hình nền hiện tại</h5>
+                            <div class="card">
+                                <div class="card-body p-2">
+                                    <div class="current-bg-container" style="height: 150px; border-radius: 8px; background-size: cover; background-position: center;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Hình nền sẽ chỉ áp dụng cho đoạn chat hiện tại với người này.
+                        </div>
                     </div>
-                    <div class="small mt-1" style="opacity: 0.7;">
-                        🎤 Voice • ${messageTime}
+
+                    <!-- Biệt danh -->
+                    <div class="tab-pane fade" id="nickname-pane" role="tabpanel" aria-labelledby="nickname-tab">
+                        <h4 class="mb-3">Đặt biệt danh</h4>
+                        <p>Chức năng này đang được phát triển.</p>
+                    </div>
+
+                    <!-- Chủ đề -->
+                    <div class="tab-pane fade" id="theme-pane" role="tabpanel" aria-labelledby="theme-tab">
+                        <h4 class="mb-3">Chủ đề đoạn chat</h4>
+                        <p>Chức năng này đang được phát triển.</p>
                     </div>
                 </div>
             </div>
-        `;
+            <div class="modal-footer">
+                <div id="chatSettingsStatus" class="text-start me-auto" style="display: none;"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        document.getElementById('messages').insertAdjacentHTML('beforeend', messageHtml);
-        scrollToBottom();
+<script>
+    // Không khai báo lại biến connection hoặc các biến toàn cục đã có trong signalr-init.js
+    if (typeof currentUserId === 'undefined') {
+        currentUserId = '@ViewBag.CurrentUser?.Id';
     }
+    selectedUserId = '@ViewBag.SelectedUserId';
+    selectedUserName = '@ViewBag.SelectedUserName';
 
-    function playVoiceMessage(voiceUrl, button) {
-        const audio = new Audio(voiceUrl);
-        const icon = button.querySelector('i');
-        const progressBar = button.parentNode.querySelector('.voice-progress');
-
-        if (button.dataset.playing === 'true') {
-            audio.pause();
-            icon.className = 'fas fa-play';
-            button.dataset.playing = 'false';
-            return;
-        }
-
-        icon.className = 'fas fa-pause';
-        button.dataset.playing = 'true';
-
-        audio.ontimeupdate = function() {
-            const progress = (audio.currentTime / audio.duration) * 100;
-            progressBar.style.width = progress + '%';
-        };
-
-        audio.onended = function() {
-            icon.className = 'fas fa-play';
-            button.dataset.playing = 'false';
-            progressBar.style.width = '0%';
-        };
-
-        audio.play();
-    }
-
-    function formatDuration(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    // Load chat history
-    function loadChatHistory(userId) {
-        fetch(`/Chat/GetMessages?userId=${userId}`)
-            .then(response => response.json())
-            .then(messages => {
-                if (messages && messages.length > 0) {
-                    console.log(`📚 Loading ${messages.length} messages`);
-                    messages.forEach(msg => {
-                        if (msg.messageType === 'text') {
-                            displayMessage(msg.senderId, msg.senderName, msg.content, msg.timestamp);
-                        } else if (msg.messageType === 'image' || msg.messageType === 'video' || msg.messageType === 'document') {
-                            const fileName = msg.content.split('/').pop();
-                            displayMediaMessage(msg.senderId, msg.senderName, msg.content, msg.messageType, fileName, 0, msg.timestamp);
-                        } else if (msg.messageType === 'voice') {
-                            displayVoiceMessage(msg.senderId, msg.senderName, msg.content, 0, msg.timestamp);
-                        }
-                    });
-                } else {
-                    console.log('📭 No messages found');
-                }
-            })
-            .catch(err => {
-                console.error('❌ Error loading chat history:', err);
-                showNotification('Không thể tải lịch sử chat', 'error');
-            });
-    }
-
-    function scrollToBottom() {
-        const messagesContainer = document.getElementById('messagesContainer');
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    // Initialize everything when page loads
+    // Initialize the app
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Initializing chat application...');
-
         setupEventListeners();
-        initializeSignalR();
-
-        // Auto-select user if specified in URL
-        if (selectedUserId && selectedUserName) {
-            selectUser(selectedUserId, selectedUserName);
+        // Đảm bảo template sẵn sàng trước khi gọi displayMessage
+        if (document.getElementById('messageOptionsMenu')) {
+            const hasValidUserId = selectedUserId && selectedUserId.trim() !== '' && selectedUserId !== 'undefined' && selectedUserId !== 'null';
+            const hasValidUserName = selectedUserName && selectedUserName.trim() !== '' && selectedUserName !== 'undefined' && selectedUserName !== 'null';
+            if (hasValidUserId && hasValidUserName) {
+                const userCount = document.querySelectorAll('.user-item').length;
+                if (userCount > 0) {
+                    selectUser(selectedUserId, selectedUserName);
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const checkUsers = setInterval(() => {
+                        attempts++;
+                        const currentUserCount = document.querySelectorAll('.user-item').length;
+                        if (currentUserCount > 0) {
+                            clearInterval(checkUsers);
+                            selectUser(selectedUserId, selectedUserName);
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(checkUsers);
+                            selectUser(selectedUserId, selectedUserName);
+                        }
+                    }, 250);
+                }
+            }
+        } else {
+            setTimeout(() => {
+                if (document.getElementById('messageOptionsMenu')) {
+                    const hasValidUserId = selectedUserId && selectedUserId.trim() !== '' && selectedUserId !== 'undefined' && selectedUserId !== 'null';
+                    const hasValidUserName = selectedUserName && selectedUserName.trim() !== '' && selectedUserName !== 'undefined' && selectedUserName !== 'null';
+                    if (hasValidUserId && hasValidUserName) {
+                        const userCount = document.querySelectorAll('.user-item').length;
+                        if (userCount > 0) {
+                            selectUser(selectedUserId, selectedUserName);
+                        }
+                    }
+                }
+            }, 1000); // Đợi 1 giây để thử lại
         }
     });
 </script>
+
+<!-- Tham chiếu đến file JavaScript riêng cho logic xử lý menu tùy chọn (đặt trước để đảm bảo tải trước) -->
+<script src="~/js/message-options.js"></script>
+
+<!-- Tham chiếu đến file xử lý tin nhắn -->
+<script src="~/js/message-handling.js"></script>
+
+<!-- Tham chiếu đến các file khác (nếu có) -->
+<script src="~/js/user-selection.js"></script>
+<script src="~/js/signalr-init.js"></script>
+<script src="~/js/webrtc-calls.js"></script>
+@section Scripts {
+    <script src="~/js/chat-settings-manager.js"></script>
+}
+<script src="~/js/persistent-background.js"></script>
+<!-- Message Options Menu Template (đặt trực tiếp với ID đúng) -->
+<div id="messageOptionsMenu" class="message-options-menu d-none" style="background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; min-width: 120px;">
+    <div class="option" data-action="delete" style="padding: 5px; cursor: pointer;">Xóa</div>
+    <div class="option" data-action="reply" style="padding: 5px; cursor: pointer;">Trả lời</div>
+    <div class="option" data-action="pin" style="padding: 5px; cursor: pointer;">Ghim</div>
+    <div class="option" data-action="report" style="padding: 5px; cursor: pointer;">Báo cáo</div>
+    <div class="option" data-action="recall" style="padding: 5px; cursor: pointer; position: relative;">
+        Thu hồi
+        <div class="sub-menu" style="display: none; position: absolute; left: 100%; top: 0; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px;">
+            <div class="sub-option" data-action="recall-sender" style="padding: 5px; cursor: pointer;">Thu hồi phía bạn</div>
+            <div class="sub-option" data-action="recall-both" style="padding: 5px; cursor: pointer;">Thu hồi cho cả hai</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Thêm màu sắc giống Messenger FB */
+    .bg-messenger-blue {
+        background-color: #0084ff; /* Màu xanh dương của Messenger */
+        border-radius: 10px;
+        padding: 8px 12px;
+    }
+
+    .bg-messenger-gray {
+        background-color: #e9ecef; /* Màu xám nhạt cho tin nhắn nhận */
+        border-radius: 10px;
+        padding: 8px 12px;
+    }
+
+    .message-options-menu {
+        position: absolute;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        z-index: 1000; /* Tăng z-index để đảm bảo hiển thị trên các phần tử khác */
+        min-width: 120px;
+        padding: 8px 0;
+    }
+
+        .message-options-menu .option {
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+
+            .message-options-menu .option:hover {
+                background: #f0f0f0;
+            }
+
+    .d-none {
+        display: none;
+    }
+
+    .message-item {
+        position: relative;
+        margin-bottom: 10px; /* Thêm khoảng cách giữa các tin nhắn */
+    }
+
+    .message-options-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0 5px;
+        color: #888;
+        margin-left: 5px;
+        vertical-align: middle; /* Căn giữa theo chiều dọc */
+    }
+
+        .message-options-btn:hover {
+            color: #333;
+        }
+</style>
+
+
+<style>
+    .pinned-dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f2f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .pinned-item-content {
+        flex: 1;
+        min-width: 0;
+        padding-right: 8px;
+    }
+
+    .pinned-sender {
+        font-weight: 600;
+        color: #050505;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .pinned-text {
+        color: #65676b;
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .btn-unpin-small {
+        background: none;
+        border: none;
+        color: #8a8d91;
+        padding: 4px 8px;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+        .btn-unpin-small:hover {
+            background: #f0f2f5;
+            color: #e41e3f;
+        }
+
+    .pinned-dropdown-item:hover {
+        background: #f8f9fa;
+    }
+
+        .pinned-dropdown-item:hover .pinned-item-content {
+            color: #1877f2;
+        }
+</style>

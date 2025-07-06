@@ -1,0 +1,484 @@
+﻿@model List<webchat.Models.Report>
+@{
+    ViewData["Title"] = "Quản lý báo cáo";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-flag text-danger"></i> Quản lý báo cáo</h2>
+                    <p class="text-muted">Xem xét và xử lý các báo cáo từ người dùng</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("BulkActions", "ReportManagement", new { area = "Admin" })" class="btn btn-primary">
+                        <i class="fas fa-tasks"></i> Xử lý hàng loạt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">@ViewBag.PendingCount</h3>
+                    <p class="mb-0">Chờ xử lý</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@ViewBag.ResolvedCount</h3>
+                    <p class="mb-0">Đã giải quyết</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h3 class="text-danger">@ViewBag.RejectedCount</h3>
+                    <p class="mb-0">Đã từ chối</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@ViewBag.TotalReports</h3>
+                    <p class="mb-0">Tổng báo cáo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select name="status" id="status" class="form-select">
+                                @{
+                                    var currentStatus = ViewBag.CurrentStatus?.ToString() ?? "all";
+                                }
+                                <option value="all" selected="@(currentStatus == "all")">Tất cả</option>
+                                <option value="pending" selected="@(currentStatus == "pending")">Chờ xử lý</option>
+                                <option value="resolved" selected="@(currentStatus == "resolved")">Đã giải quyết</option>
+                                <option value="rejected" selected="@(currentStatus == "rejected")">Đã từ chối</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="searchString" class="form-label">Tìm kiếm</label>
+                            <input type="text" name="searchString" id="searchString" class="form-control"
+                                   value="@ViewBag.SearchString" placeholder="Tìm theo tên, email, lý do...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Danh sách báo cáo</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Người báo cáo</th>
+                                        <th>Người bị báo cáo</th>
+                                        <th>Lý do</th>
+                                        <th>Loại</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var report in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>#@report.ReportId</strong>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">@(report.Reporter?.FullName ?? "N/A")</div>
+                                                        <small class="text-muted">@report.Reporter?.Email</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm rounded-circle bg-warning d-flex align-items-center justify-content-center me-2">
+                                                        <i class="fas fa-exclamation text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">@(report.ReportedUser?.FullName ?? "N/A")</div>
+                                                        <small class="text-muted">@report.ReportedUser?.Email</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-danger">@report.Reason</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@report.ReportType</span>
+                                            </td>
+                                            <td>
+                                                @switch (report.Status.ToLower())
+                                                {
+                                                    case "pending":
+                                                        <span class="badge bg-warning">Chờ xử lý</span>
+                                                        break;
+                                                    case "resolved":
+                                                        <span class="badge bg-success">Đã giải quyết</span>
+                                                        break;
+                                                    case "rejected":
+                                                        <span class="badge bg-danger">Đã từ chối</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <div>@report.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                                <small class="text-muted">@report.CreatedAt.ToString("HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <!-- View Details Button -->
+                                                    <a href="@Url.Action("Details", "ReportManagement", new { area = "Admin", id = report.ReportId })"
+                                                       class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    @if (report.Status == "Pending")
+                                                    {
+                                                        <!-- Dropdown Menu for Quick Actions -->
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button"
+                                                                    data-bs-toggle="dropdown" title="Hành động nhanh">
+                                                                <i class="fas fa-bolt"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <button class="dropdown-item" onclick="quickProcess(@report.ReportId, 'warning')">
+                                                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Cảnh báo user
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button class="dropdown-item" onclick="quickProcess(@report.ReportId, 'ban_user_temporary')">
+                                                                        <i class="fas fa-clock text-danger me-2"></i>Ban tạm thời
+                                                                    </button>
+                                                                </li>
+                                                                <li>
+                                                                    <button class="dropdown-item" onclick="quickProcess(@report.ReportId, 'ban_user_permanent')">
+                                                                        <i class="fas fa-ban text-dark me-2"></i>Ban vĩnh viễn
+                                                                    </button>
+                                                                </li>
+                                                                @if (report.ReportedMessageId.HasValue)
+                                                                {
+                                                                    <li><hr class="dropdown-divider"></li>
+                                                                    <li>
+                                                                        <button class="dropdown-item" onclick="quickProcess(@report.ReportId, 'delete_message')">
+                                                                            <i class="fas fa-trash text-danger me-2"></i>Xóa tin nhắn
+                                                                        </button>
+                                                                    </li>
+                                                                }
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li>
+                                                                    <button class="dropdown-item" onclick="quickProcess(@report.ReportId, 'reject')">
+                                                                        <i class="fas fa-times text-secondary me-2"></i>Từ chối
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fs-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">Không có báo cáo nào</h5>
+                            <p class="text-muted">Chưa có báo cáo nào được tìm thấy với bộ lọc hiện tại.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Reports pagination">
+                    <ul class="pagination justify-content-center">
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", "ReportManagement", new { area = "Admin", status = ViewBag.CurrentStatus, searchString = ViewBag.SearchString, page = i })">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Quick Process Modal -->
+<div class="modal fade" id="quickProcessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xử lý báo cáo #<span id="reportIdDisplay"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quickProcessForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="reportId" name="reportId">
+                    <input type="hidden" id="action" name="action">
+
+                    <div class="mb-3" id="actionDescription">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="actionText"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="banDurationDiv" style="display: none;">
+                        <label for="banDuration" class="form-label">Thời gian ban</label>
+                        <select id="banDuration" name="banDuration" class="form-select">
+                            <option value="1">1 ngày</option>
+                            <option value="3">3 ngày</option>
+                            <option value="7" selected>7 ngày</option>
+                            <option value="14">14 ngày</option>
+                            <option value="30">30 ngày</option>
+                            <option value="90">90 ngày</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adminNote" class="form-label">Ghi chú admin <span class="text-danger">*</span></label>
+                        <textarea id="adminNote" name="adminNote" class="form-control" rows="4"
+                                  placeholder="Nhập lý do chi tiết cho quyết định này..." required></textarea>
+                        <div class="form-text">Ghi chú này sẽ được ghi lại trong hệ thống và có thể được gửi cho người dùng.</div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Lưu ý:</strong> Hành động này sẽ được ghi lại vĩnh viễn và không thể hoàn tác.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-primary" onclick="submitQuickProcess()">
+                    <i class="fas fa-check me-1"></i>Xác nhận xử lý
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+
+    .dropdown-item {
+        cursor: pointer;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+        }
+</style>
+
+<script>
+    function quickProcess(reportId, action) {
+        document.getElementById('reportId').value = reportId;
+        document.getElementById('action').value = action;
+        document.getElementById('adminNote').value = '';
+        document.getElementById('reportIdDisplay').textContent = reportId;
+
+        // Hiển thị/ẩn ban duration
+        const banDurationDiv = document.getElementById('banDurationDiv');
+        const actionText = document.getElementById('actionText');
+
+        const actionDescriptions = {
+            'warning': {
+                text: 'Gửi cảnh báo đến người dùng bị báo cáo về hành vi vi phạm.',
+                showBanDuration: false
+            },
+            'ban_user_temporary': {
+                text: 'Ban tạm thời người dùng bị báo cáo khỏi hệ thống.',
+                showBanDuration: true
+            },
+            'ban_user_permanent': {
+                text: 'Ban vĩnh viễn người dùng bị báo cáo khỏi hệ thống.',
+                showBanDuration: false
+            },
+            'delete_message': {
+                text: 'Xóa tin nhắn bị báo cáo khỏi hệ thống và giải quyết báo cáo.',
+                showBanDuration: false
+            },
+            'reject': {
+                text: 'Từ chối báo cáo này vì không có vi phạm thực sự.',
+                showBanDuration: false
+            }
+        };
+
+        const actionInfo = actionDescriptions[action];
+        if (actionInfo) {
+            actionText.textContent = actionInfo.text;
+
+            if (actionInfo.showBanDuration) {
+                banDurationDiv.style.display = 'block';
+                document.getElementById('banDuration').required = true;
+            } else {
+                banDurationDiv.style.display = 'none';
+                document.getElementById('banDuration').required = false;
+            }
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('quickProcessModal'));
+        modal.show();
+    }
+
+    function submitQuickProcess() {
+        const form = document.getElementById('quickProcessForm');
+        const formData = new FormData(form);
+
+        // Validation
+        if (!formData.get('adminNote').trim()) {
+            showAlert('warning', 'Vui lòng nhập ghi chú admin');
+            return;
+        }
+
+        const data = {
+            id: parseInt(formData.get('reportId')),
+            action: formData.get('action'),
+            adminNote: formData.get('adminNote'),
+            banDuration: formData.get('banDuration') ? parseInt(formData.get('banDuration')) : null
+        };
+
+        // Hiển thị loading
+        const submitBtn = document.querySelector('#quickProcessModal .btn-primary');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang xử lý...';
+        submitBtn.disabled = true;
+
+        fetch('@Url.Action("ProcessReport", "ReportManagement", new { area = "Admin" })', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                showAlert('success', result.message);
+
+                // Đóng modal và reload trang
+                bootstrap.Modal.getInstance(document.getElementById('quickProcessModal')).hide();
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showAlert('danger', result.message || 'Có lỗi xảy ra');
+            }
+        })
+        .catch(error => {
+            console.error('Error processing report:', error);
+            showAlert('danger', 'Lỗi kết nối: ' + error.message);
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 350px; max-width: 500px;';
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+</script>

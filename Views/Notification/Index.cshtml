@@ -1,0 +1,148 @@
+﻿@{
+    ViewData["Title"] = "Thông báo";
+    var notifications = ViewBag.Notifications as List<DatingApp.Models.NotificationDto> ?? new List<DatingApp.Models.NotificationDto>();
+    var unreadCount = (int)(ViewBag.UnreadCount ?? 0);
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="notification-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="fas fa-bell me-2"></i>Thông báo</h2>
+                        @if (unreadCount > 0)
+                        {
+                            <span class="badge bg-danger">@unreadCount chưa đọc</span>
+                        }
+                    </div>
+                    <div class="notification-actions">
+                        @if (unreadCount > 0)
+                        {
+                            <button class="btn btn-outline-primary me-2" onclick="markAllAsRead()">
+                                <i class="fas fa-check-double"></i> Đánh dấu tất cả đã đọc
+                            </button>
+                        }
+                        <button class="btn btn-outline-secondary" onclick="refreshNotifications()">
+                            <i class="fas fa-sync-alt"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loadingNotifications" class="text-center" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div id="notificationsList" class="notifications-container">
+                @if (notifications.Any())
+                {
+                    @foreach (var notification in notifications)
+                    {
+                        <div class="notification-item @(notification.IsRead ? "read" : "unread") @notification.CssClass"
+                             data-notification-id="@notification.Id"
+                             data-type="@notification.Type"
+                             data-from-user="@notification.FromUserId">
+
+                            <div class="notification-avatar">
+                                <img src="@notification.FromUserAvatar"
+                                     alt="@notification.FromUserName"
+                                     onerror="this.src='/images/default-avatar.jpg'">
+                                <div class="notification-type-icon @notification.CssClass">
+                                    <i class="@notification.Icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    @notification.Content
+                                </div>
+                                <div class="notification-meta">
+                                    <span class="notification-time">
+                                        <i class="fas fa-clock"></i>
+                                        @notification.TimeAgo
+                                    </span>
+                                    <span class="notification-from">
+                                        từ <strong>@notification.FromUserName</strong>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="notification-actions">
+                                @if (!notification.IsRead)
+                                {
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            onclick="markAsRead(@notification.Id)">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
+
+                                @{
+                                    var actionButtons = GetActionButtons(notification.Type, notification.FromUserId);
+                                }
+                                @Html.Raw(actionButtons)
+
+                                <button class="btn btn-sm btn-outline-danger ms-1"
+                                        onclick="deleteNotification(@notification.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-notifications text-center">
+                        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                        <h4>Không có thông báo nào</h4>
+                        <p class="text-muted">Khi có thông báo mới, chúng sẽ hiển thị ở đây.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+@functions {
+    private string GetActionButtons(string type, string fromUserId)
+    {
+        return type switch
+        {
+            "like" or "super-like" => $@"
+                <button class=""btn btn-sm btn-success ms-1""
+                        onclick=""viewProfile('{fromUserId}')"">
+                    <i class=""fas fa-user""></i> Xem
+                </button>",
+            "match" => $@"
+                <button class=""btn btn-sm btn-primary ms-1""
+                        onclick=""openChat('{fromUserId}')"">
+                    <i class=""fas fa-comments""></i> Nhắn tin
+                </button>",
+            "message" => $@"
+                <button class=""btn btn-sm btn-info ms-1""
+                        onclick=""openChat('{fromUserId}')"">
+                    <i class=""fas fa-reply""></i> Trả lời
+                </button>",
+            _ => ""
+        };
+    }
+}
+
+<script src="~/js/notification.js"></script>

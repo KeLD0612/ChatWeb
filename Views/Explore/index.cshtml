@@ -1,0 +1,321 @@
+﻿@model List<webchat.Models.UserProfile>
+@{
+    ViewData["Title"] = "Khám Phá";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentUserId = ViewBag.CurrentUserId as string;
+    var currentUserProfile = ViewBag.CurrentUserProfile as webchat.Models.UserProfile;
+}
+
+<!-- File location: Views/Explore/Index.cshtml -->
+
+<div class="explore-container">
+    <!-- Header Section -->
+    <div class="explore-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1 class="app-title">💖 Tìm Kiếm Tình Yêu</h1>
+                <p class="app-subtitle">Khám phá những người thú vị xung quanh bạn</p>
+            </div>
+            <div class="user-info">
+                <div class="current-user-avatar">
+                    @if (!string.IsNullOrEmpty(currentUserProfile?.ProfilePictureUrl))
+                    {
+                        <img src="@currentUserProfile.ProfilePictureUrl" alt="Your Avatar" class="avatar-img">
+                    }
+                    else
+                    {
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    }
+                </div>
+                <span class="welcome-text">Xin chào, @(currentUserProfile?.User?.FullName ?? "User")</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="explore-main">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">
+                    <i class="fas fa-globe"></i>
+                    Tất cả
+                </button>
+                <button class="filter-tab" data-filter="nearby">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Gần đây
+                </button>
+                <button class="filter-tab" data-filter="new">
+                    <i class="fas fa-star"></i>
+                    Mới tham gia
+                </button>
+            </div>
+            <div class="filter-options">
+                <select class="age-filter" id="ageFilter">
+                    <option value="">Mọi độ tuổi</option>
+                    <option value="18-25">18-25 tuổi</option>
+                    <option value="26-35">26-35 tuổi</option>
+                    <option value="36-45">36-45 tuổi</option>
+                    <option value="46+">46+ tuổi</option>
+                </select>
+                <select class="gender-filter" id="genderFilter">
+                    <option value="">Mọi giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Cards Container -->
+        <div class="cards-container" id="cardsContainer">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var profile in Model)
+                {
+                    // Prepare data
+                    var photoUrls = new List<string>();
+                    if (!string.IsNullOrEmpty(profile.PhotoUrls))
+                    {
+                        try
+                        {
+                            photoUrls = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(profile.PhotoUrls) ?? new List<string>();
+                        }
+                        catch { }
+                    }
+
+                    if (!string.IsNullOrEmpty(profile.ProfilePictureUrl) && !photoUrls.Contains(profile.ProfilePictureUrl))
+                    {
+                        photoUrls.Insert(0, profile.ProfilePictureUrl);
+                    }
+
+                    var interests = new List<string>();
+                    if (!string.IsNullOrEmpty(profile.Interests))
+                    {
+                        try
+                        {
+                            interests = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(profile.Interests) ?? new List<string>();
+                        }
+                        catch { }
+                    }
+
+                    var userName = profile.User?.FullName ?? "Unknown";
+                    var userAge = "";
+                    if (profile.DateOfBirth.HasValue)
+                    {
+                        userAge = (DateTime.Now.Year - profile.DateOfBirth.Value.Year).ToString();
+                    }
+
+                    <!-- User Card -->
+                    <div class="user-card" data-user-id="@profile.UserId" data-profile-id="@profile.Id">
+                        <!-- Card Images -->
+                        <div class="card-images">
+                            @if (photoUrls.Any())
+                            {
+                                for (int i = 0; i < photoUrls.Count && i < 5; i++)
+                                {
+                                    <div class="card-image @(i == 0 ? "active" : "")" style="background-image: url('@photoUrls[i]')">
+                                        @if (photoUrls.Count > 1)
+                                        {
+                                            <div class="image-indicators">
+                                                @for (int j = 0; j < photoUrls.Count && j < 5; j++)
+                                                {
+                                                    <span class="indicator @(j == i ? "active" : "")" data-index="@j"></span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="card-image active no-image">
+                                    <div class="no-image-placeholder">
+                                        <i class="fas fa-user"></i>
+                                        <p>Chưa có ảnh</p>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Navigation Arrows -->
+                            @if (photoUrls.Count > 1)
+                            {
+                                <button class="nav-arrow prev-arrow" onclick="changeImage(this, -1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="nav-arrow next-arrow" onclick="changeImage(this, 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            }
+
+                            <!-- Online Status -->
+                            <div class="online-status online">
+                                <span class="status-dot"></span>
+                                Đang hoạt động
+                            </div>
+                        </div>
+
+                        <!-- Card Info -->
+                        <div class="card-info">
+                            <div class="basic-info">
+                                <h3 class="user-name">
+                                    @userName
+                                    @if (!string.IsNullOrEmpty(userAge))
+                                    {
+                                        <span class="age">@userAge</span>
+                                    }
+                                </h3>
+                                <p class="location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    @(profile.Location ?? "Chưa cập nhật")
+                                </p>
+                            </div>
+
+                            <div class="quick-info">
+                                @if (!string.IsNullOrEmpty(profile.Bio))
+                                {
+                                    <p class="bio">@profile.Bio</p>
+                                }
+
+                                @if (interests.Any())
+                                {
+                                    <div class="interests">
+                                        @for (int k = 0; k < Math.Min(interests.Count, 3); k++)
+                                        {
+                                            <span class="interest-tag">@interests[k]</span>
+                                        }
+                                        @if (interests.Count > 3)
+                                        {
+                                            <span class="more-interests">+@(interests.Count - 3)</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Stats -->
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <i class="fas fa-eye"></i>
+                                    <span>@profile.ViewCount</span>
+                                </div>
+                                <div class="stat">
+                                    <i class="fas fa-heart"></i>
+                                    <span>@profile.LikeCount</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="card-actions">
+                            <button class="action-btn pass-btn" onclick="passUser('@profile.UserId')" title="Bỏ qua">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="action-btn message-btn" onclick="showQuickMessage('@profile.UserId', '@Html.Raw(userName.Replace("'", "\\'"))')" title="Nhắn tin">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            <button class="action-btn like-btn" onclick="likeUser('@profile.UserId')" title="Thích">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="action-btn superlike-btn" onclick="superLikeUser('@profile.UserId')" title="Siêu thích">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- No Users Available -->
+                <div class="no-users">
+                    <div class="no-users-content">
+                        <i class="fas fa-heart-broken"></i>
+                        <h3>Không có ai ở đây cả!</h3>
+                        <p>Hãy thử thay đổi bộ lọc hoặc quay lại sau nhé.</p>
+                        <button class="btn-refresh" onclick="location.reload()">
+                            <i class="fas fa-sync"></i>
+                            Làm mới
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Load More Button -->
+        <div class="load-more-section" id="loadMoreSection">
+            <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreUsers()">
+                <i class="fas fa-plus"></i>
+                Xem thêm
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Message Modal -->
+<div class="modal" id="quickMessageModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Gửi tin nhắn cho <span id="targetUserName">User</span></h3>
+            <button class="close-btn" onclick="closeQuickMessage()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="quickMessageForm">
+                <div class="quick-message-suggestions">
+                    <p>Gợi ý tin nhắn:</p>
+                    <div class="suggestion-buttons">
+                        <button type="button" class="suggestion-btn" onclick="selectSuggestion('Chào bạn! Mình thấy profile của bạn rất thú vị 😊')">
+                            👋 Chào hỏi
+                        </button>
+                        <button type="button" class="suggestion-btn" onclick="selectSuggestion('Hi! Chúng ta có nhiều sở thích chung nhỉ!')">
+                            💫 Sở thích chung
+                        </button>
+                        <button type="button" class="suggestion-btn" onclick="selectSuggestion('Mình có thể kết bạn với bạn không? 🙂')">
+                            🤝 Kết bạn
+                        </button>
+                    </div>
+                </div>
+                <textarea id="quickMessageText"
+                          placeholder="Viết tin nhắn của bạn..."
+                          maxlength="500"
+                          rows="4"></textarea>
+                <div class="char-count">
+                    <span id="charCount">0</span>/500
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeQuickMessage()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Gửi tin nhắn
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <i class="fas fa-heart fa-beat"></i>
+        <p>Đang tải...</p>
+    </div>
+</div>
+
+<!-- Success/Error Notifications -->
+<div class="notification" id="notification">
+    <div class="notification-content">
+        <i class="notification-icon"></i>
+        <span class="notification-message"></span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/explore.js"></script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/explore.css" />
+}

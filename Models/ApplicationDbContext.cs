@@ -18,6 +18,12 @@ namespace webchat.Models
         public DbSet<MediaFile> MediaFiles { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<CallRecord> CallRecords { get; set; }
+        public DbSet<MessageReaction> MessageReactions { get; set; }
+        public DbSet<UserWarning> UserWarnings { get; set; }
+
+        public DbSet<ChatSettings> ChatSettings { get; set; }
+        // Thêm vào ApplicationDbContext.cs
+        public DbSet<LocationMessage> LocationMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -41,6 +47,45 @@ namespace webchat.Models
                 entity.Property(m => m.MessageType)
                     .HasMaxLength(20)
                     .HasDefaultValue("text");
+
+                entity.Property(m => m.IsPinned)
+                    .HasDefaultValue(false);
+
+                entity.Property(m => m.IsRecalled)
+                    .HasDefaultValue(false);
+
+                entity.Property(m => m.RecalledFor)
+                    .HasMaxLength(20)
+                    .IsRequired(false); // Cho phép NULL để khớp với model
+
+                entity.HasOne(m => m.RepliedMessage)
+                    .WithMany()
+                    .HasForeignKey(m => m.RepliedMessageId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            // Configure MessageReaction
+            builder.Entity<MessageReaction>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+
+                entity.HasOne(r => r.Message)
+                    .WithMany(m => m.Reactions)
+                    .HasForeignKey(r => r.MessageId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(r => r.User)
+                    .WithMany()
+                    .HasForeignKey(r => r.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Unique constraint - một user chỉ được react 1 lần cho 1 message
+                entity.HasIndex(r => new { r.MessageId, r.UserId })
+                    .IsUnique();
+
+                entity.Property(r => r.ReactionType)
+                    .HasMaxLength(20)
+                    .IsRequired();
             });
 
             // Configure Match
@@ -150,6 +195,73 @@ namespace webchat.Models
                 entity.Property(c => c.Status)
                     .HasMaxLength(20)
                     .HasDefaultValue("completed");
+            });
+            // Thêm vào phương thức OnModelCreating trong ApplicationDbContext.cs
+            builder.Entity<LocationMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(m => m.Sender)
+                    .WithMany()
+                    .HasForeignKey(m => m.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Receiver)
+                    .WithMany()
+                    .HasForeignKey(m => m.ReceiverId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Trong OnModelCreating
+            builder.Entity<ChatSettings>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(c => c.User)
+                    .WithMany()
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Đảm bảo mỗi cặp UserId-OtherUserId là duy nhất
+                entity.HasIndex(c => new { c.UserId, c.OtherUserId })
+                    .IsUnique();
+            });
+
+            builder.Entity<Report>(entity =>
+            {
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.CreatedAt);
+                entity.HasIndex(e => e.ReporterId);
+                entity.HasIndex(e => e.ReportedUserId);
+
+                // Configure relationships
+                entity.HasOne(r => r.Reporter)
+                      .WithMany(u => u.ReportsSubmitted)
+                      .HasForeignKey(r => r.ReporterId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.ReportedUser)
+                      .WithMany(u => u.ReportsReceived)
+                      .HasForeignKey(r => r.ReportedUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.ReportedMessage)
+                      .WithMany(m => m.Reports)
+                      .HasForeignKey(r => r.ReportedMessageId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // CONFIGURATION CHO USER WARNINGS
+            builder.Entity<UserWarning>(entity =>
+            {
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.CreatedAt);
+                entity.HasIndex(e => e.IsActive);
+
+                entity.HasOne(w => w.User)
+                      .WithMany(u => u.Warnings)
+                      .HasForeignKey(w => w.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

@@ -1,0 +1,128 @@
+﻿/* ===== MESSAGE TYPES STYLES ===== */
+
+/* Emoji messages */
+.emoji-message {
+    font-size: 48px !important;
+    line-height: 1 !important;
+    display: inline-block;
+    animation: emojiPop 0.3s ease-out;
+}
+
+@keyframes emojiPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Sticker messages */
+.sticker-message {
+    max-width: 140px !important;
+    max-height: 140px !important;
+    display: inline-block;
+    animation: stickerBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+    .sticker-message img {
+        width: 100%;
+        height: auto;
+        max-width: 140px;
+        max-height: 140px;
+        object-fit: contain;
+        border-radius: 12px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+
+@keyframes stickerBounceIn {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2) rotate(-5deg);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Voice messages */
+.voice-message {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 20px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 250px;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+/* Special message containers */
+.message-content[data-message-type="emoji"],
+.message-content[data-message-type="sticker"] {
+    padding: 6px !important;
+    min-width: auto !important;
+    text-align: center;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.message-mine .message-content[data-message-type="emoji"],
+.message-mine .message-content[data-message-type="sticker"],
+.message-other .message-content[data-message-type="emoji"],
+.message-other .message-content[data-message-type="sticker"] {
+    background: transparent !important;
+}
+
+/* Image messages */
+.message-content[data-message-type="image"] img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+    .message-content[data-message-type="image"] img:hover {
+        transform: scale(1.02);
+    }
+
+/* Video messages */
+.message-content[data-message-type="video"] video {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 12px;
+}
+
+/* Document messages */
+.message-content[data-message-type="document"] {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+}
+
+    .message-content[data-message-type="document"] a {
+        color: #0d6efd;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .message-content[data-message-type="document"] a:hover {
+            text-decoration: underline;
+        }

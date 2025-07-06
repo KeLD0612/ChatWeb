@@ -1,0 +1,431 @@
+﻿@model webchat.Models.ViewModels.CompleteRegistrationViewModel
+@{
+    ViewData["Title"] = "Hoàn thành đăng ký";
+    Layout = "_LayoutClean"; // Layout đơn giản không có header/footer
+}
+<!-- ✅ FIX: Thêm script này vào đầu trang Index.cshtml -->
+<script>
+    window.serverData = {
+        isExternalLogin: @Json.Serialize(ViewBag.IsExternalLogin ?? false),
+        externalProvider: '@(ViewBag.ExternalProvider ?? "")',
+        prefilledEmail: '@(ViewBag.PrefilledEmail ?? "")', 
+        prefilledName: '@(ViewBag.PrefilledName ?? "")',
+        skipBasicInfo: @Json.Serialize(ViewBag.SkipBasicInfo ?? false),
+        startStep: @(ViewBag.StartStep ?? 1)
+    };
+    console.log('Server data loaded:', window.serverData);
+</script>
+
+
+<!-- ✅ THÊM ĐOẠN DEBUG NÀY -->
+<div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 9999; font-size: 12px;">
+    DEBUG:<br>
+    IsExternalLogin = @Model.IsExternalLogin <br>
+    Provider = @(Model.ExternalLoginProvider ?? "null") <br>
+    Email = @(Model.Email ?? "null")
+</div>
+
+
+<div class="registration-container">
+    <div class="registration-card">
+        <!-- Header -->
+        <div class="registration-header">
+            <h1 class="step-title" id="stepTitle">Chào mừng đến với Dating App! ❤️ </h1>
+            <p class="step-subtitle" id="stepSubtitle">Tìm kiếm tình yêu đích thực chỉ trong vài bước</p>
+            <div class="step-indicator">
+                <span class="step-number" id="stepNumber">1</span>
+                <span class="step-total">/ 11</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- Steps Container -->
+        <form id="registrationForm" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <!-- Step 1: Welcome -->
+            <div class="step active" id="step1">
+                <div class="step-content">
+                    <div class="welcome-content">
+                        <div class="welcome-icon">💕</div>
+                        <h2>Tìm kiếm tình yêu đích thực</h2>
+                        <p>Chúng tôi sẽ giúp bạn tạo hồ sơ hoàn hảo để tìm được người phù hợp nhất</p>
+                        <ul class="features-list">
+                            <li>✨ Tạo hồ sơ cá nhân độc đáo</li>
+                            <li>💖 Kết nối với những người phù hợp</li>
+                            <li>🔒 An toàn và bảo mật tuyệt đối</li>
+                            <li>🎯 Thuật toán gợi ý thông minh</li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-next" onclick="nextStep()">
+                        Bắt đầu tạo hồ sơ <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+<!-- Step 2: Basic Info -->
+<div class="step" id="step2">
+    <div class="step-content">
+        <h2>Thông tin cơ bản 📝</h2>
+        
+        <!-- Nickname/FullName - Luôn hiển thị -->
+        <div class="form-group">
+            <label for="fullName">Tên hiển thị của bạn là gì? *</label>
+            <input type="text" 
+                   id="fullName" 
+                   name="FullName" 
+                   value="@(Model.FullName ?? "")"
+                   class="form-control" 
+                   placeholder="Nhập tên hiển thị">
+            <div class="validation-message" id="fullNameError"></div>
+            @if (Model.IsExternalLogin)
+            {
+                <small class="text-muted">💡 Bạn có thể chỉnh sửa tên hiển thị từ @(Model.ExternalLoginProvider ?? "mạng xã hội")</small>
+            }
+        </div>
+
+        <!-- Email và Password - Chỉ hiển thị nếu KHÔNG phải external login -->
+        @if (!Model.IsExternalLogin)
+        {
+            <div class="form-group" id="emailGroup">
+                <label for="email">Email của bạn *</label>
+                <input type="email" 
+                       id="email" 
+                       name="Email" 
+                       value="@(Model.Email ?? "")"
+                       class="form-control" 
+                       placeholder="example@gmail.com">
+                <div class="email-check" id="emailCheck"></div>
+                <div class="validation-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group" id="passwordGroup">
+                <label for="password">Mật khẩu *</label>
+                <input type="password" 
+                       id="password" 
+                       name="Password" 
+                       class="form-control" 
+                       placeholder="Ít nhất 6 ký tự">
+                <div class="validation-message" id="passwordError"></div>
+            </div>
+        }
+        else
+        {
+            <!-- Hiển thị info cho external login user -->
+            <div class="alert alert-info external-login-info">
+                <div class="external-login-content">
+                    @{
+                        var providerIcon = Model.ExternalLoginProvider?.ToLower() switch
+                        {
+                            "facebook" => "fab fa-facebook",
+                            "google" => "fab fa-google",
+                            _ => "fas fa-user"
+                        };
+                    }
+                    <i class="@providerIcon external-provider-icon"></i>
+                    <div class="external-login-text">
+                        <strong>Đăng nhập bằng @(Model.ExternalLoginProvider ?? "mạng xã hội")</strong>
+                        <br>
+                        <span class="external-email">@(Model.Email ?? "")</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden inputs cho external login -->
+            <input type="hidden" id="email" name="Email" value="@(Model.Email ?? "")">
+            <input type="hidden" name="Password" value="">
+        }
+
+        <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+    </div>
+</div>
+
+            <!-- Step 3: Gender -->
+            <div class="step" id="step3">
+                <div class="step-content">
+                    <h2>Giới tính của bạn 👫</h2>
+                    <p>Để chúng tôi tìm người phù hợp với bạn</p>
+                    <div class="gender-options">
+                        <div class="gender-option" onclick="selectGender('Nam', this)">
+                            <div class="gender-icon">👨</div>
+                            <span>Nam</span>
+                        </div>
+                        <div class="gender-option" onclick="selectGender('Nữ', this)">
+                            <div class="gender-icon">👩</div>
+                            <span>Nữ</span>
+                        </div>
+                        <div class="gender-option" onclick="selectGender('Khác', this)">
+                            <div class="gender-icon">🏳️‍⚧️</div>
+                            <span>Khác</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="gender" name="Gender">
+                    <div class="validation-message" id="genderError"></div>
+                    <button type="button" class="btn-next" id="genderNext" onclick="nextStep()" disabled>Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Birthday -->
+            <div class="step" id="step4">
+                <div class="step-content">
+                    <h2>Ngày sinh của bạn 🎂</h2>
+                    <p>Chúng tôi cần biết tuổi của bạn</p>
+                    <div class="birthday-selector">
+                        <div class="date-group">
+                            <label>Ngày</label>
+                            <select id="birthDay" name="BirthDay" class="form-select">
+                                <option value="">Ngày</option>
+                            </select>
+                        </div>
+                        <div class="date-group">
+                            <label>Tháng</label>
+                            <select id="birthMonth" name="BirthMonth" class="form-select">
+                                <option value="">Tháng</option>
+                            </select>
+                        </div>
+                        <div class="date-group">
+                            <label>Năm</label>
+                            <select id="birthYear" name="BirthYear" class="form-select">
+                                <option value="">Năm</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="validation-message" id="birthdayError"></div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Location -->
+            <div class="step" id="step5">
+                <div class="step-content">
+                    <h2>Bạn ở đâu? 📍</h2>
+                    <p>Tìm kiếm những người gần bạn</p>
+                    <div class="location-selector">
+                        <div class="form-group">
+                            <label for="province">Tỉnh/Thành phố *</label>
+                            <select id="province" name="Province" class="form-select" onchange="loadDistricts()">
+                                <option value="">Chọn tỉnh thành</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">Quận/Huyện *</label>
+                            <select id="district" name="District" class="form-select" disabled>
+                                <option value="">Chọn quận huyện</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="validation-message" id="locationError"></div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Interests -->
+            <div class="step" id="step6">
+                <div class="step-content">
+                    <h2>Sở thích của bạn 🎯</h2>
+                    <p>Chọn những gì bạn yêu thích (tối đa 8)</p>
+                    <div class="interests-grid" id="interestsGrid">
+                        <!-- Sẽ được tạo bằng JavaScript -->
+                    </div>
+                    <div class="custom-interest">
+                        <input type="text" id="customInterest" placeholder="Thêm sở thích khác..." class="form-control">
+                        <button type="button" onclick="addCustomInterest()" class="btn-add">+</button>
+                    </div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Fashion Style -->
+            <div class="step" id="step7">
+                <div class="step-content">
+                    <h2>Phong cách thời trang 👗</h2>
+                    <p>Bạn thích ăn mặc như thế nào?</p>
+                    <div class="fashion-options" id="fashionOptions">
+                        <!-- Sẽ được tạo bằng JavaScript -->
+                    </div>
+                    <div class="custom-fashion">
+                        <input type="text" id="customFashionStyle" name="CustomFashionStyle" placeholder="Mô tả phong cách khác..." class="form-control">
+                    </div>
+                    <input type="hidden" id="fashionStyle" name="FashionStyle">
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 8: Personality -->
+            <div class="step" id="step8">
+                <div class="step-content">
+                    <h2>Tính cách của bạn 🌟</h2>
+                    <p>Chọn những từ mô tả bạn (tối đa 6)</p>
+                    <div class="personality-grid" id="personalityGrid">
+                        <!-- Sẽ được tạo bằng JavaScript -->
+                    </div>
+                    <div class="custom-personality">
+                        <input type="text" id="customPersonality" name="CustomPersonality" placeholder="Mô tả khác về tính cách..." class="form-control">
+                    </div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 9: Relationship Goal -->
+            <div class="step" id="step9">
+                <div class="step-content">
+                    <h2>Mục tiêu mối quan hệ 💕</h2>
+                    <p>Bạn đang tìm kiếm điều gì?</p>
+                    <div class="relationship-options" id="relationshipOptions">
+                        <!-- Sẽ được tạo bằng JavaScript -->
+                    </div>
+                    <div class="custom-relationship">
+                        <input type="text" id="customRelationshipGoal" name="CustomRelationshipGoal" placeholder="Mục tiêu khác..." class="form-control">
+                    </div>
+                    <input type="hidden" id="relationshipGoal" name="RelationshipGoal">
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 10: Ideal Partner -->
+            <div class="step" id="step10">
+                <div class="step-content">
+                    <h2>Người lý tưởng 💝</h2>
+                    <p>Mô tả về người bạn muốn tìm hiểu</p>
+                    <div class="form-group">
+                        <textarea id="idealPartner" name="IdealPartner" class="form-control" rows="4"
+                                  placeholder="Ví dụ: Tôi muốn tìm một người tử tế, hài hước, yêu thích du lịch..."></textarea>
+                    </div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 11: Bio -->
+            <div class="step" id="step11">
+                <div class="step-content">
+                    <h2>Giới thiệu bản thân ✍️</h2>
+                    <p>Viết vài dòng để người khác hiểu về bạn</p>
+                    <div class="form-group">
+                        <textarea id="bio" name="Bio" class="form-control" rows="4" maxlength="500"
+                                  placeholder="Ví dụ: Tôi là một người yêu thích du lịch, thích khám phá những điều mới mẻ..."></textarea>
+                        <div class="char-count">
+                            <span id="bioCharCount">0</span>/500
+                        </div>
+                    </div>
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 12: Photos -->
+            <div class="step" id="step12">
+                <div class="step-content">
+                    <h2>Thêm ảnh của bạn 📸</h2>
+                    <p>Hãy để mọi người thấy vẻ đẹp của bạn</p>
+
+                    <!-- Ảnh đại diện -->
+                    <div class="photo-section">
+                        <h3>Ảnh đại diện *</h3>
+                        <div class="profile-photo-upload">
+                            <input type="file" id="profilePicture" name="ProfilePicture" accept="image/*" onchange="previewProfilePhoto(this)">
+                            <div class="upload-area" onclick="document.getElementById('profilePicture').click()">
+                                <div class="upload-icon" id="profileIcon">📷</div>
+                                <img id="profilePreview" style="display: none;">
+                                <p>Chọn ảnh đại diện</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ảnh bổ sung -->
+                    <div class="photo-section">
+                        <h3>Ảnh bổ sung (tối đa 4 ảnh)</h3>
+                        <div class="additional-photos-grid" id="additionalPhotosGrid">
+                            <div class="photo-upload-slot" onclick="addAdditionalPhoto(0)">
+                                <div class="upload-icon">+</div>
+                                <p>Thêm ảnh</p>
+                            </div>
+                            <div class="photo-upload-slot" onclick="addAdditionalPhoto(1)">
+                                <div class="upload-icon">+</div>
+                                <p>Thêm ảnh</p>
+                            </div>
+                            <div class="photo-upload-slot" onclick="addAdditionalPhoto(2)">
+                                <div class="upload-icon">+</div>
+                                <p>Thêm ảnh</p>
+                            </div>
+                            <div class="photo-upload-slot" onclick="addAdditionalPhoto(3)">
+                                <div class="upload-icon">+</div>
+                                <p>Thêm ảnh</p>
+                            </div>
+                        </div>
+                        <!-- Hidden file inputs -->
+                        <input type="file" id="additionalPhoto0" name="AdditionalPhotos" accept="image/*" style="display: none;" onchange="previewAdditionalPhoto(0, this)">
+                        <input type="file" id="additionalPhoto1" name="AdditionalPhotos" accept="image/*" style="display: none;" onchange="previewAdditionalPhoto(1, this)">
+                        <input type="file" id="additionalPhoto2" name="AdditionalPhotos" accept="image/*" style="display: none;" onchange="previewAdditionalPhoto(2, this)">
+                        <input type="file" id="additionalPhoto3" name="AdditionalPhotos" accept="image/*" style="display: none;" onchange="previewAdditionalPhoto(3, this)">
+                    </div>
+
+                    <button type="button" class="btn-next" onclick="nextStep()">Tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Step 13: Complete -->
+            <div class="step" id="step13">
+                <div class="step-content">
+                    <div class="completion-content">
+                        <div class="completion-icon">🎉</div>
+                        <h2>Hoàn thành!</h2>
+                        <p>Hồ sơ của bạn đã sẵn sàng! Chào mừng bạn đến với cộng đồng Dating App</p>
+                        <div class="completion-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">🔍</div>
+                                <span>Khám phá người dùng khác</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">💬</div>
+                                <span>Nhắn tin không giới hạn</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">❤️</div>
+                                <span>Tìm kiếm tình yêu đích thực</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-complete" id="completeBtn" onclick="completeRegistration()">
+                        <i class="fas fa-rocket"></i> Bắt đầu khám phá
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Đang tạo hồ sơ của bạn...</p>
+    </div>
+</div>
+
+<!-- DEBUG INFO -->
+<div style="position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 9999; font-size: 12px;">
+    DEBUG:<br>
+    IsExternalLogin = @Model.IsExternalLogin <br>
+    Provider = @(Model.ExternalLoginProvider ?? "null") <br>
+    Email = @(Model.Email ?? "null")
+</div>
+
+<!-- ✅ THÊM SCRIPT NÀY -->
+<script>
+    window.serverData = {
+        isExternalLogin: @Json.Serialize(Model.IsExternalLogin),
+        externalProvider: @Json.Serialize(Model.ExternalLoginProvider ?? ""),
+        prefilledEmail: @Json.Serialize(Model.Email ?? ""),
+        prefilledName: @Json.Serialize(Model.FullName ?? "")
+    };
+    console.log('ServerData passed to JS:', window.serverData);
+</script>
+
+@section Scripts {
+    <script src="~/js/complete-registration.js"></script>
+}

@@ -1,74 +1,85 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using webchat.Models;
 
-[Area("Admin")]
-public class AccountController : Controller
+namespace webchat.Areas.Admin.Controllers
 {
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public AccountController(SignInManager<ApplicationUser> signInManager,
-                           UserManager<ApplicationUser> userManager)
+    [Area("Admin")]
+    public class AccountController : Controller
     {
-        _signInManager = signInManager;
-        _userManager = userManager;
-    }
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-    // GET: /Admin/Account/Login
-    [AllowAnonymous]
-    public IActionResult Login(string returnUrl = null)
-    {
-        ViewData["ReturnUrl"] = returnUrl;
-        return View();
-    }
-
-    // POST: /Admin/Account/Login
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(AdminLoginViewModel model, string returnUrl = null)
-    {
-        ViewData["ReturnUrl"] = returnUrl;
-
-        if (ModelState.IsValid)
+        public AccountController(SignInManager<ApplicationUser> signInManager,
+                               UserManager<ApplicationUser> userManager)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password,
-                                                                 model.RememberMe, lockoutOnFailure: true);
-            if (result.Succeeded)
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+            _signInManager = signInManager;
+            _userManager = userManager;
+        }
 
-                // Kiểm tra user có role Admin không
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
+        // GET: /Admin/Account/Login
+        [AllowAnonymous]
+        public IActionResult Login(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        // POST: /Admin/Account/Login
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(AdminLoginViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password,
+                                                                     model.RememberMe, lockoutOnFailure: true);
+                if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl ?? "/Admin/Dashboard");
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+
+                    // Kiểm tra user có role Admin không
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToLocal(returnUrl ?? "/Admin/Dashboard");
+                    }
+                    else
+                    {
+                        await _signInManager.SignOutAsync();
+                        ModelState.AddModelError(string.Empty, "Bạn không có quyền truy cập Admin.");
+                        return View(model);
+                    }
                 }
-                else
-                {
-                    await _signInManager.SignOutAsync();
-                    ModelState.AddModelError(string.Empty, "Bạn không có quyền truy cập Admin.");
-                    return View(model);
-                }
+
+                ModelState.AddModelError(string.Empty, "Đăng nhập không thành công.");
             }
 
-            ModelState.AddModelError(string.Empty, "Đăng nhập không thành công.");
+            return View(model);
         }
 
-        return View(model);
-    }
-
-    private IActionResult RedirectToLocal(string returnUrl)
-    {
-        if (Url.IsLocalUrl(returnUrl))
+        // POST: /Admin/Account/Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
-            return Redirect(returnUrl);
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
-        else
+
+        private IActionResult RedirectToLocal(string returnUrl)
         {
-            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            }
         }
     }
 }

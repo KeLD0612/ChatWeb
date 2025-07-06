@@ -1,0 +1,101 @@
+﻿/* Fix lỗi modal tối màn hình không thể click */
+
+/* Đảm bảo modal và backdrop có z-index phù hợp */
+.modal {
+    z-index: 1055 !important; /* Tăng z-index để đảm bảo hiển thị trên backdrop */
+}
+
+.modal-backdrop {
+    z-index: 1050 !important; /* Đảm bảo backdrop có z-index thấp hơn modal */
+}
+
+/* Đảm bảo modal-dialog hiển thị đúng */
+.modal-dialog {
+    z-index: 1056 !important; /* Cao hơn modal */
+    pointer-events: auto !important; /* Đảm bảo có thể click */
+}
+
+/* Tăng độ trong suốt của backdrop để dễ nhìn hơn */
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+/* Làm cho modal content rõ ràng và có thể click */
+.modal-content {
+    pointer-events: auto !important;
+    position: relative !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Đảm bảo tabs và nội dung có thể click */
+.nav-tabs .nav-link {
+    pointer-events: auto !important;
+}
+
+.tab-content {
+    pointer-events: auto !important;
+}
+
+/* Fix lỗi modal không hiển thị đủ chiều cao trên một số trình duyệt */
+body.modal-open {
+    overflow: hidden;
+    padding-right: 0 !important; /* Tránh bị shift content */
+}
+
+/* Đảm bảo các phần tử bên trong modal có thể click được */
+.modal-body,
+.modal-footer,
+.modal-header,
+.modal-body button,
+.modal-body input,
+.modal-body .card,
+.modal-body img {
+    pointer-events: auto !important;
+}
+
+/* Làm nổi bật các item có thể click */
+.bg-template-item {
+    cursor: pointer !important;
+    transition: transform 0.2s !important;
+}
+
+    .bg-template-item:hover {
+        transform: translateY(-5px) !important;
+    }
+
+    .bg-template-item img {
+        cursor: pointer !important;
+    }
+
+/* Đảm bảo modal hiển thị đúng kích thước */
+.modal-dialog {
+    margin: 1.75rem auto !important;
+    max-width: 800px !important; /* Đảm bảo modal đủ rộng */
+}
+
+@media (max-width: 992px) {
+    .modal-dialog {
+        max-width: 90% !important;
+        margin: 1rem auto !important;
+    }
+}
+
+/* Đảm bảo các phần tử trong chat container không bị ảnh hưởng bởi modal */
+#messages,
+#messagesContainer,
+.input-group {
+    z-index: auto !important;
+}
+
+/* Đảm bảo overlay không block các click events */
+.modal-backdrop {
+    pointer-events: auto !important;
+}
+
+/* Đảm bảo avatar và user info có thể click để mở modal */
+.chat-avatar,
+.chat-user-info {
+    cursor: pointer !important;
+    z-index: 1000 !important;
+    position: relative !important;
+}

@@ -603,5 +603,391 @@
     .voice-message {
         background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
     }
+
+    /* Thêm vào cuối file chat.css hiện tại */
+
+    /* Active user highlight - improved */
+    .user-item.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%) !important;
+        color: white !important;
+        border-radius: 10px;
+        margin: 2px;
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        animation: activeUserGlow 1s ease-in-out;
+    }
+
+        .user-item.active .fw-bold,
+        .user-item.active .text-muted {
+            color: white !important;
+        }
+
+    @keyframes activeUserGlow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+        }
+
+        100% {
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+    }
+
+    /* Voice Recording Styles */
+    .recording-indicator {
+        display: flex;
+        align-items: center;
+    }
+
+    .pulse-dot {
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Voice Message Bubble */
+    .voice-message {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 20px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 250px;
+        animation: messageSlideIn 0.3s ease-out;
+    }
+
+        .voice-message .play-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+            .voice-message .play-button:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+
+    .voice-waveform {
+        flex: 1;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .voice-progress {
+        height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 10px;
+        transition: width 0.1s ease;
+    }
+
+    /* Connection Status */
+    .connection-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .connection-status.connected {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .connection-status.connecting {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .connection-status.disconnected {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            animation: shake 0.5s ease-in-out;
+        }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    /* Call Button Animations */
+    .call-button {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .call-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Call Controls */
+    .call-controls {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        padding: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .call-control-btn {
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .call-control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .call-control-btn.muted {
+            background-color: #dc3545 !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
 }
 
+/* ===== REACTION STYLES ===== */
+
+/* Reaction Button */
+.reaction-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    min-width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #65676b;
+}
+
+    .reaction-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .reaction-btn:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: scale(1.1);
+        color: #1877f2;
+    }
+
+/* Reaction Picker */
+.reaction-picker {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 4px 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: none;
+    gap: 2px;
+    z-index: 1000;
+    animation: fadeInScale 0.15s ease-out;
+    width: fit-content;
+    height: 34px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.reaction-option {
+    cursor: pointer;
+    font-size: 18px;
+    padding: 3px;
+    border-radius: 50%;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+}
+
+    .reaction-option:hover {
+        background-color: #f0f2f5;
+        transform: scale(1.15);
+    }
+
+/* Reactions Container */
+.reactions-container {
+    margin-top: 4px;
+    min-height: 20px;
+}
+
+.reactions-display {
+    display: inline-flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.reaction-badge {
+    background: #f0f2f5;
+    border-radius: 12px;
+    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    border: 1px solid transparent;
+}
+
+    .reaction-badge:hover {
+        background: #e4e6e9;
+        border-color: #1877f2;
+        transform: scale(1.05);
+    }
+
+.reaction-emoji {
+    font-size: 14px;
+}
+
+.reaction-count {
+    color: #65676b;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+/* Điều chỉnh cho tin nhắn của mình */
+.message-mine .reaction-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+    .message-mine .reaction-badge:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+.message-mine .reaction-count {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Animation cho reactions mới */
+.reaction-badge {
+    animation: bounceIn 0.3s ease-out;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Dark Mode Support cho Reactions */
+@media (prefers-color-scheme: dark) {
+    .reaction-picker {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .reaction-option:hover {
+        background-color: #4a5568;
+    }
+
+    .reaction-badge {
+        background: #4a5568;
+        color: white;
+    }
+
+        .reaction-badge:hover {
+            background: #718096;
+            border-color: #0d6efd;
+        }
+
+    .reaction-count {
+        color: #e2e8f0;
+    }
+}
+
+/* Responsive adjustments cho Reactions */
+@media (max-width: 768px) {
+    .reaction-picker {
+        padding: 4px 8px;
+    }
+
+    .reaction-option {
+        font-size: 20px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .reaction-btn {
+        font-size: 16px;
+        min-width: 24px;
+        height: 24px;
+    }
+}

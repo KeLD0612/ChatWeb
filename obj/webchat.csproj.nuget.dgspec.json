@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MSI\\Desktop\\DoanWeb_test\\webchat\\webchat.csproj": {}
+    "C:\\Users\\MSI\\Desktop\\Dotnet6\\webchat\\webchat.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MSI\\Desktop\\DoanWeb_test\\webchat\\webchat.csproj": {
+    "C:\\Users\\MSI\\Desktop\\Dotnet6\\webchat\\webchat.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MSI\\Desktop\\DoanWeb_test\\webchat\\webchat.csproj",
+        "projectUniqueName": "C:\\Users\\MSI\\Desktop\\Dotnet6\\webchat\\webchat.csproj",
         "projectName": "webchat",
-        "projectPath": "C:\\Users\\MSI\\Desktop\\DoanWeb_test\\webchat\\webchat.csproj",
+        "projectPath": "C:\\Users\\MSI\\Desktop\\Dotnet6\\webchat\\webchat.csproj",
         "packagesPath": "C:\\Users\\MSI\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MSI\\Desktop\\DoanWeb_test\\webchat\\obj\\",
+        "outputPath": "C:\\Users\\MSI\\Desktop\\Dotnet6\\webchat\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.Facebook": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Microsoft.AspNetCore.Authentication.Google": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[9.0.6, )"
